@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Racines Carrées — Entraînement & Évaluation</title>
+<script>
+  window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},svg:{fontCache:'global'}};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{--bg:#0b1020;--card:#0f1530;--accent:#7c5cff;--accent2:#00e1d9;--ok:#22c55e;--err:#ef4444;--text:#e8ecff;--muted:#9db0ff}
+  *{box-sizing:border-box}body{margin:0;font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial;background:#0b1020;color:var(--text)}
+  header{position:sticky;top:0;z-index:10;background:#0c132aee;backdrop-filter:blur(8px);border-bottom:1px solid #223}
+  .container{max-width:1060px;margin:0 auto;padding:1rem 1.2rem}h1{margin:0;font-size:1.3rem}
+  nav{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem}.tab{padding:.55rem .9rem;border:1px solid #2a355f;border-radius:999px;color:var(--muted);background:#0c1230;cursor:pointer}
+  .tab.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#081022;font-weight:700}
+  main{padding:1.2rem}
+  .tabpage{display:none}
+  .tabpage.active{display:block}
+  .grid{display:grid;gap:1rem}.grid-2{grid-template-columns:1fr 1fr}
+  .card{background:linear-gradient(180deg,#0c1330,#0a122a);border:1px solid #24305c;border-radius:18px;padding:1rem}
+  .pill{display:inline-block;padding:.15rem .5rem;border-radius:999px;background:#11204a;color:#9bb5ff;border:1px solid #2a3f7f;font-size:.85rem}
+  .btn{position:relative;padding:.55rem .9rem;border-radius:12px;border:1px solid #2a355f;background:linear-gradient(90deg,#1a2248,#15224a);color:#fff;cursor:pointer;font-weight:600}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#081022;border:none}
+  .btn[disabled]{opacity:.6;cursor:not-allowed}
+  .qa{display:flex;gap:.5rem;align-items:center;margin:.35rem 0}
+  input[type=text]{flex:1;padding:.6rem .8rem;background:#0a0f22;border:1px solid #2a355f;border-radius:12px;color:#fff}
+  .mini{padding:.35rem .6rem;border-radius:10px;font-size:.9rem}.key-sqrt{background:#0f1a48;border:1px solid #3a4fb3}
+  .hint{font-size:.92rem;color:#a7b9ff;margin-top:.3rem}.ok{color:var(--ok);font-weight:700}.err{color:var(--err);font-weight:700}
+  .hidden{display:none!important}#confetti{position:fixed;inset:0;pointer-events:none;z-index:1000}
+  .item{padding:.6rem .7rem;background:#0b1433;border:1px solid #203061;border-radius:12px}
+  .btn .badge{position:absolute;right:-6px;top:-6px;background:#0c2;color:#021;border-radius:999px;padding:.05rem .35rem;font-size:.75rem;border:2px solid #061}
+  table.carres-parfaits { width: 100%; border-collapse: collapse; margin-top: 15px; background-color: #fdc1f7; color: #1c1796;} table.carres-parfaits th , table.carres-parfaits td { border: 1px solid #ddd; padding: 8px; text-align: center; } table.carres-parfaits th { background-color: #f92def; color: #141335; } table.carres-parfaits tr:nth-child(even) { background-color: #80e8fa; color: #7e1818;}
+        
+.theory-block {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.theory-block:last-child {
+  border-bottom: none;
+}
+
+.theory-block h3 {
+  font-size: 1.1rem;
+  color: #FE07FF;
+  margin-bottom: 0.5rem;
+}
+
+.formula {
+  background: #E4FFDA;
+  padding: 0.75rem;
+color: #2c8e50;
+  border-left: 3px solid #3498db;
+  margin: 0.5rem 0;
+  font-size: 1.05rem;
+}
+
+.explanation {
+  color: #FDFF0B;
+  line-height: 1.6;
+  margin: 0.5rem 0;
+}
+
+.example {
+  background: #fff9e6;
+  padding: 0.75rem;
+color: #2c8e50;
+  border-left: 3px solid #f39c12;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+/* MathJax responsive */
+mjx-container[jax="SVG"] svg { max-width: 100%; height: auto; }
+
+/* Améliorations touch */
+:root { --tap: 44px; }
+button, .btn, input[type="text"] { min-height: var(--tap); -webkit-tap-highlight-color: transparent; }
+input[type="text"] { font-size: 16px; } /* évite le zoom auto iOS */
+
+/* Tableaux en défilement horizontal si besoin */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-scroll table { min-width: 520px; } /* garde une largeur lisible */
+
+/* Mobile / petits écrans */
+@media (max-width: 768px) {
+  .container { padding: 1rem .8rem; }
+  .grid-2 { grid-template-columns: 1fr; }  /* cartes empilées */
+  nav { gap: .4rem; }
+  .tab { padding: .5rem .7rem; font-size: .95rem; }
+  .qa { flex-direction: column; align-items: stretch; gap: .5rem; }
+  .qa > * { width: 100%; }
+  input[type="text"] { width: 100%; }
+  .pill { align-self: flex-start; }
+  .carres-parfaits th, .carres-parfaits td { padding: 6px; }
+}
+
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<header>
+  <div class="container">
+    <h1>Racines carrées — Théorie • Entraînement • Évaluation</h1>
+    <nav id="tabs">
+      <div class="tab active" data-tab="theorie">Théorie</div>
+      <div class="tab" data-tab="entrainement">Entraînement</div>
+      <div class="tab" data-tab="evaluation">Évaluation</div>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+<section id="theorie" class="tabpage active">
+    <div class="grid grid-2">
+      <div class="card">
+        <h2>📐 Définition & Propriétés fondamentales</h2>
+        <div class="theory-block">
+          <h3>Propriété multiplicative</h3>
+          <p class="formula">$\sqrt{ab}=\sqrt{a}\cdot\sqrt{b}$ pour tous $a,b\geq0$</p>
+          <p class="explanation">Cette propriété permet de décomposer ou regrouper des racines carrées. Elle est la base de la simplification.</p>
+        </div>
+        <div class="theory-block">
+          <h3>Racine d'un carré</h3>
+          <p class="formula">$\sqrt{a^2}=|a|$</p>
+          <p class="explanation">La racine carrée d'un nombre au carré donne toujours la valeur absolue de ce nombre.</p>
+        </div>
+        <div class="theory-block">
+          <h3>Technique de simplification</h3>
+          <p class="explanation">Pour simplifier $\sqrt{n}$, on factorise $n$ en extrayant tous les <strong>carrés parfaits</strong> (1, 4, 9, 16, 25, 36...).</p>
+          <p class="example"><strong>Exemple :</strong> $\sqrt{72}=\sqrt{36\times2}=\sqrt{36}\times\sqrt{2}=6\sqrt{2}$</p>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>🔧 Opérations & Techniques avancées</h2>
+        <div class="theory-block">
+          <h3>Addition et soustraction</h3>
+          <p class="explanation">On ne peut additionner que des radicaux <strong>semblables</strong> (même expression sous la racine), après avoir simplifié chaque terme.</p>
+          <p class="example"><strong>Exemple :</strong> $2\sqrt{3}+5\sqrt{3}=7\sqrt{3}$ mais $\sqrt{2}+\sqrt{3}$ ne se simplifie pas.</p>
+        </div>
+        <div class="theory-block">
+          <h3>Multiplication</h3>
+          <p class="formula">$\sqrt{a}\times\sqrt{b}=\sqrt{ab}$</p>
+          <p class="explanation">On multiplie d'abord les radicaux entre eux, puis on simplifie le résultat obtenu.</p>
+        </div>
+        <div class="theory-block">
+          <h3>Utilisation des conjugués</h3>
+          <p class="formula">$(a+b\sqrt{m})(a-b\sqrt{m})=a^2-m b^2$</p>
+          <p class="explanation">Le produit d'expressions conjuguées élimine les radicaux, produisant un résultat rationnel.</p>
+        </div>
+        <div class="theory-block">
+          <h3>Rationalisation du dénominateur</h3>
+          <p class="explanation">Pour éliminer une racine carrée au dénominateur, on multiplie numérateur et dénominateur par le conjugué :</p>
+          <p class="formula">$\dfrac{p}{a+b\sqrt{m}}=\dfrac{p(a-b\sqrt{m})}{a^2-m b^2}$</p>
+          <p class="example"><strong>Pourquoi ?</strong> Cela transforme le dénominateur en nombre rationnel, facilitant les calculs.</p>
+        </div>
+      </div>
+    </div>
+      <!-- Tableau des carrés parfaits (dans l'onglet Théorie) -->
+  <div class="card" id="carres-parfaits">
+    <h2>Quelques Carrés Parfaits Utiles</h2>
+    <p>Un <strong>carré parfait</strong> est $n^2 = n \times n$. Utile pour Pythagore et simplifications.</p>
+
+    <div class="table-scroll">
+    <table class="carres-parfaits">
+      <thead>
+        <tr>
+          <th>n</th><th>$n^2$</th>
+          <th>n</th><th>$n^2$</th>
+          <th>n</th><th>$n^2$</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>1</td><td>8</td><td>64</td><td>15</td><td>225</td></tr>
+        <tr><td>2</td><td>4</td><td>9</td><td>81</td><td>16</td><td>256</td></tr>
+        <tr><td>3</td><td>9</td><td>10</td><td>100</td><td>17</td><td>289</td></tr>
+        <tr><td>4</td><td>16</td><td>11</td><td>121</td><td>18</td><td>324</td></tr>
+        <tr><td>5</td><td>25</td><td>12</td><td>144</td><td>19</td><td>361</td></tr>
+        <tr><td>6</td><td>36</td><td>13</td><td>169</td><td>20</td><td>400</td></tr>
+        <tr><td>7</td><td>49</td><td>14</td><td>196</td><td>21</td><td>441</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  </section>
+
+  <section id="entrainement" class="tabpage">
+    <div class="card">
+      <h2>Choisis une compétence</h2>
+      <div class="qa" id="skillBar">
+        <button id="btn-simplify" class="btn mini" onclick="spawnTrainer('simplify')">Simplifier</button>
+        <button id="btn-addsub"  class="btn mini" onclick="spawnTrainer('addsub')">Addition/Soustraction</button>
+        <button id="btn-product"  class="btn mini" onclick="spawnTrainer('product')">Produits</button>
+        <button id="btn-distrib"  class="btn mini" onclick="spawnTrainer('distrib')">Distributivité</button>
+        <button id="btn-conj"     class="btn mini" onclick="spawnTrainer('conjugates')">Conjugués & binômes</button>
+        <button id="btn-square"   class="btn mini" onclick="spawnTrainer('squares')">Carrés de binômes</button>
+        <button id="btn-rA"       class="btn mini" onclick="spawnTrainer('rationalizeA')">Rationaliser — A</button>
+        <button id="btn-rB"       class="btn mini" onclick="spawnTrainer('rationalizeB')">Rationaliser — B</button>
+      </div>
+    </div>
+    <div id="trainerZone" style="margin-top:1rem"></div>
+  </section>
+
+  <section id="evaluation" class="tabpage">
+    <div class="card">
+      <h2>Évaluation</h2>
+      <div class="qa">
+        <input id="studentName" type="text" placeholder="Ton prénom et nom">
+        <button class="btn primary" onclick="startExam()">Lancer</button>
+        <button class="btn" id="regenExam" onclick="regenExam()" disabled>Refaire</button>
+        <span class="pill" id="scoreText">Score: 0/0</span>
+        <span class="pill" id="timerText">00:00</span>
+      </div>
+    </div>
+    <div id="examArea" class="grid" style="margin-top:1rem"></div>
+    <div class="qa">
+      <button class="btn" id="submitBtn" onclick="submitExam()">Valider mes réponses</button>
+      <button class="btn" onclick="showAnswers()">Afficher les corrections</button>
+      <button class="btn" id="downloadDiploma" onclick="downloadDiploma()" disabled>Télécharger mon diplôme</button>
+    </div>
+    <div class="card hidden" id="examReport" style="margin-top:1rem">
+      <h2>Rapport</h2>
+      <div id="reportList"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ---------- utilitaires & confetti ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a, choice=a=>a[Math.floor(Math.random()*a.length)];
+$('#tabs').addEventListener('click',e=>{
+  const t=e.target.closest('.tab'); if(!t) return;
+  $$('#tabs .tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+  $$('.tabpage').forEach(s=>s.classList.remove('active')); $('#'+t.dataset.tab).classList.add('active');
+  MathJax.typesetPromise();
+});
+const confetti=$('#confetti'),ctx=confetti.getContext('2d'); const pcs=[]; function resize(){confetti.width=innerWidth;confetti.height=innerHeight} addEventListener('resize',resize); resize();
+function shoot(){for(let i=0;i<160;i++){pcs.push({x:Math.random()*innerWidth,y:-10,vy:2+Math.random()*3,vx:-2+Math.random()*4,s:3+Math.random()*4,r:Math.random()*3.14});}}
+!function loop(){ctx.clearRect(0,0,confetti.width,confetti.height);pcs.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=.1;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=`hsl(${(p.y/3)%360},100%,60%)`;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s);ctx.restore();});for(let i=pcs.length-1;i>=0;i--)if(pcs[i].y>innerHeight+20)pcs.splice(i,1);requestAnimationFrame(loop);}();
+
+/* ---------- parsing / vérifs ---------- */
+function evaluate(user){
+  let s=(user||'').trim();
+  s=s.replace(/√\s*\(/g,'sqrt(').replace(/√\s*([0-9]+(\.[0-9]+)?)/g,'sqrt($1)');
+  s=s.replace(/\\sqrt\s*\{([^{}]+)\}/g,'sqrt($1)');
+  if(!/^[-+*/()., 0-9a-zA-Z]+$/.test(s.replace(/sqrt/g,''))) throw new Error('bad');
+  s=s.replace(/sqrt\s*\(/g,'Math.sqrt(').replace(/,/g,'.');
+  s=s.replace(/([0-9\)])\s*(Math\.sqrt)/g,'$1*$2').replace(/\)\s*\(/g,')*(')
+   .replace(/(Math\.sqrt\([^)]*\))\s*(Math\.sqrt)/g,'$1*$2')
+   .replace(/(Math\.sqrt\([^)]*\))\s*(\d)/g,'$1*$2')
+   .replace(/(Math\.sqrt\([^)]*\))\s*\(/g,'$1*(');
+  return Function('return('+s+')')();
+}
+const numEq=(a,b,eps=1e-9)=>Math.abs(a-b)<=eps*(1+Math.max(1,Math.abs(a),Math.abs(b)));
+const isSimplified=txt=>!(/\\sqrt\s*\{\s*(4|9|16|25|36|49|64|81|100)\s*\}/.test(txt)||/\\sqrt\s*\{\s*(8|12|18|20|24|27|28|32|40|44|45|48|50|52|63|72|75|80|98)\s*\}/.test(txt));
+const hasRadDen=txt=>/\/\s*(\\sqrt\s*\{|√)/.test(txt);
+
+/* forme réduite imposée : pas deux fois le même radicande squarefree */
+function isReduced(text){
+  if(!isSimplified(text)) return false;
+  const rads=[...text.matchAll(/\\sqrt\{\s*(\d+)\s*\}/g)].map(m=>m[1]);
+  const seen=new Set();
+  for(const r of rads){ if(seen.has(r)) return false; seen.add(r); }
+  return true;
+}
+
+function insertSqrt(btn){const inp=btn.closest('.qa').querySelector('input[type=text]');inp.focus();const s=inp.selectionStart??inp.value.length;const e=inp.selectionEnd??inp.value.length;const bef=inp.value.slice(0,s),aft=inp.value.slice(e);inp.value=bef+"\\sqrt{}"+aft;const pos=bef.length+6;inp.setSelectionRange(pos,pos);}
+
+/* ---------- simplification helpers ---------- */
+function extractSquare(n){let k=1,m=n;for(const s of [100,81,64,49,36,25,16,9,4]){while(m%s===0){m/=s;k*=Math.sqrt(s)}}return[k,m]}
+function texRad(k,m){if(m===1)return String(k); if(k===1)return"\\sqrt{"+m+"}"; if(k===-1)return"-\\sqrt{"+m+"}"; return k+"\\sqrt{"+m+"}"}
+function texSum(parts){const out=[];for(const {c,rad} of parts){const [k,m]=extractSquare(rad);const coeff=c*k;if(coeff===0)continue;out.push(texRad(coeff,m));}if(out.length===0)return"0";return out.map((t,i)=>i===0?t:(t.startsWith('-')?' - '+t.slice(1):' + '+t)).join('');}
+function texCombine(parts){const bag=new Map();for(const {c,rad} of parts){const [k,m]=extractSquare(rad);const coeff=c*k;if(coeff===0)continue;bag.set(m,(bag.get(m)||0)+coeff);}const out=[];for(const [m,coeff] of bag.entries()){if(coeff!==0)out.push(texRad(coeff,Number(m)));}if(out.length===0)return"0";return out.map((t,i)=>i===0?t:(t.startsWith('-')?' - '+t.slice(1):' + '+t)).join('');}
+
+/* petit formateur pour "A ± B" en texte pur */
+const plusMinus=(B)=> (B>=0? ' + '+B : ' - '+Math.abs(B));
+
+/* ---------- générateurs ---------- */
+function qSimplify(){
+  const n=choice([rnd(50,120),8,12,18,20,45,72,75,98]);
+  const [k,m]=extractSquare(n), texQ="\\(\\sqrt{"+n+"}\\)", ans=m===1?String(k):texRad(k,m), val=Math.sqrt(n);
+  return {type:'simplify',texQ,val,ansText:ans,check:u=>numEq(evaluate(u),val)&&isSimplified(u),hint:"Extrais les carrés parfaits."};
+}
+function qAddSub(){
+  const bases=[2,3,5,6,7], b1=choice(bases), b2=choice(bases.filter(x=>x!==b1));
+  const n1=b1*(choice([2,3,5,7]))**2, n2=b1*(choice([2,3,5,7]))**2, n3=b2*(choice([2,3,5,7]))**2;
+  const extra=choice([0,2,3,4]);
+  const texQ="\\(\\sqrt{"+n1+"} + \\sqrt{"+n2+"} + \\sqrt{"+n3+"}"+(extra? " + "+texRad(extra,b2):"")+"\\)";
+  const [kA,mA]=extractSquare(n1), [kB,mB]=extractSquare(n2), [kC,mC]=extractSquare(n3);
+  const c1=kA+kB, c2=kC+extra;
+  const left = c1? texRad(c1,mA):"", right=c2? texRad(c2,mC):"";
+  const ans = left && right ? left+" + "+right : (left||right||"0");
+  const val = Math.sqrt(n1)+Math.sqrt(n2)+Math.sqrt(n3)+(extra?extra*Math.sqrt(b2):0);
+  return {type:'addsub',texQ,val,ansText:ans,check:u=>numEq(evaluate(u),val)&&isReduced(u),hint:"Simplifie puis regroupe les radicaux identiques (forme réduite)."};
+}
+function qProduct(){
+  const pool=[6,8,10,12,15,18,20,45,50,72,98], a=choice(pool), b=choice(pool.filter(x=>x!==a));
+  const [k,m]=extractSquare(a*b);
+  return {type:'product',texQ:"\\(\\sqrt{"+a+"}\\cdot\\sqrt{"+b+"}\\)",val:Math.sqrt(a*b),ansText:texRad(k,m),check:u=>numEq(evaluate(u),Math.sqrt(a*b))&&isSimplified(u),hint:"Regroupe sous une seule racine puis simplifie."};
+}
+function qDistrib(){
+  if(Math.random()<0.55){
+    const k=rnd(1,4), m=choice([2,3,5,6,7,10]),
+          a=rnd(1,4), b=rnd(1,4),
+          n=choice([2,3,5,6,7,10]),
+          p=choice([2,3,5,6,7,10].filter(x=>x!==n)),
+          sgn=choice(['+','-']);
+    const texQ="\\("+texRad(k,m)+"("+texRad(a,n)+" "+sgn+" "+texRad(b,p)+")\\)";
+    const parts=[{c:k*a,rad:m*n},{c:(sgn==='+')?k*b:-k*b,rad:m*p}];
+    const ansText=texSum(parts)+" = "+texCombine(parts);
+    const val=parts.reduce((S,t)=>S+t.c*Math.sqrt(t.rad),0);
+    return {type:'distrib',texQ,val,ansText,check:u=>numEq(evaluate(u),val)&&isReduced(u),hint:"1) Développe  2) Simplifie  3) Regroupe (forme réduite)."};
+  }else{
+    const a=rnd(1,3), b=rnd(1,3), c=rnd(1,3), d=rnd(1,3);
+    const m=choice([2,3,5,6,7,10]),
+          n=choice([2,3,5,6,7,10].filter(x=>x!==m)),
+          p=choice([2,3,5,6,7,10]),
+          q=choice([2,3,5,6,7,10].filter(x=>x!==p));
+    const s1=choice(['+','-']), s2=choice(['+','-']);
+    const texQ="\\(("+texRad(a,m)+" "+s1+" "+texRad(b,n)+")("+texRad(c,p)+" "+s2+" "+texRad(d,q)+")\\)";
+    const parts=[
+      {c:a*c,rad:m*p},
+      {c:(s2==='+')?a*d:-a*d,rad:m*q},
+      {c:(s1==='+')?b*c:-b*c,rad:n*p},
+      {c:(s1===s2)? b*d : -b*d,rad:n*q}
+    ];
+    const ansText=texSum(parts)+" = "+texCombine(parts);
+    const val=parts.reduce((S,t)=>S+t.c*Math.sqrt(t.rad),0);
+    return {type:'distrib',texQ,val,ansText,check:u=>numEq(evaluate(u),val)&&isReduced(u),hint:"1) Développe  2) Simplifie  3) Regroupe (forme réduite)."};
+  }
+}
+
+/* >>>>>> Carrés de binômes — avec gestion m=n rare + réduction totale <<<<<< */
+function qSquares(){
+  const sameRad = Math.random()<0.15;            // ≈ 15% seulement de cas m = n
+  const sgn=choice(['+','-']);
+  const a=rnd(1,4), b=rnd(1,4);
+  const pool=[2,3,5,6,7,10];
+  const m=choice(pool);
+  const n = sameRad ? m : choice(pool.filter(x=>x!==m));
+
+  const texQ="\\(("+texRad(a,m)+" "+sgn+" "+texRad(b,n)+")^2\\)";
+
+  if(m===n){
+    // (a√m ± b√m)^2 = ((a ± b)^2) m  => entier final
+    const sPart = (a*a + b*b) * m;                 // x^2 + y^2
+    const cross = (sgn==='+'? 2*a*b : -2*a*b) * m; // ± 2xy
+    const final  = sPart + cross;                   // ((a±b)^2) m
+    const developed = sPart + plusMinus(cross).replace(/^ \+ /,' + ').replace(/^ - /,' - ');
+    const ansText = developed + " = " + final;
+    return {
+      type:'squares',
+      texQ,
+      val: final,
+      ansText,
+      check:u=> numEq(evaluate(u),final) && isReduced(u), // pas de radical -> OK
+      hint:"Réduis complètement : $(a\\sqrt m \\pm b\\sqrt m)^2=((a\\pm b)^2)m$ (entier)."
+    };
+  }else{
+    // cas général m ≠ n (comme avant)
+    const S=a*a*m+b*b*n;
+    const coef=(sgn==='+')?2*a*b:-2*a*b;
+    const rad=m*n; const [kR,mR]=extractSquare(rad);
+    const parts=[]; if(S) parts.push(String(S)); if(coef*kR) parts.push(texRad(coef*kR,mR));
+    const ans=parts.length? parts.join(' + ').replace('+ -',' - ') : '0';
+    const val=S + coef*Math.sqrt(rad);
+    return {type:'squares',texQ,val,ansText:ans,check:u=>numEq(evaluate(u),val)&&isReduced(u),hint:"(x±y)^2 = x^2 ± 2xy + y^2 (forme réduite)."};
+  }
+}
+/* -------------------------------------------------------------------------- */
+
+function qConjugates(){
+  const a=rnd(2,5), b=rnd(2,4), m=choice([2,3,5,6,7,10]); const texQ="\\(("+a+" + "+texRad(b,m)+")("+a+" - "+texRad(b,m)+")\\)";
+  return {type:'conjugates',texQ,val:a*a-m*b*b,ansText:String(a*a-m*b*b),check:u=>numEq(evaluate(u),a*a-m*b*b),hint:"Produit de conjugués: a^2 - mb^2."};
+}
+function qRatA(){
+  const a=rnd(1,12), n=choice([2,3,5,6,7,10,11,13,14]);
+  return {type:'rationalizeA',texQ:"\\(\\dfrac{"+a+"}{\\sqrt{"+n+"}}\\)",val:a/Math.sqrt(n),ansText:"\\frac{"+a+"\\sqrt{"+n+"}}{"+n+"}",rationalize:true,check:u=>numEq(evaluate(u),a/Math.sqrt(n))&&!hasRadDen(u),hint:"Multiplie par \\sqrt{"+n+"}/\\sqrt{"+n+"}."};
+}
+function qRatB(){
+  let p=rnd(1,9), a=rnd(1,6), b=rnd(1,6), m=choice([2,3,5,6,7,10,11,13]); while(a*a-m*b*b<=0){a=rnd(1,6);b=rnd(1,6);m=choice([2,3,5,6,7,10,11,13]);}
+  const denom=a*a-m*b*b, texQ="\\(\\dfrac{"+p+"}{"+a+"+"+texRad(b,m)+"}\\)";
+  const ans="\\dfrac{"+p+"("+a+"-"+texRad(b,m)+")}{"+a+"^2-"+m+"\\cdot"+b+"^2}=\\dfrac{"+(p*a)+"-"+(p*b)+"\\sqrt{"+m+"}}{"+denom+"}";
+  return {type:'rationalizeB',texQ,val:p/(a+b*Math.sqrt(m)),ansText:ans,rationalize:true,check:u=>numEq(evaluate(u),p/(a+b*Math.sqrt(m)))&&!hasRadDen(u),hint:"Multiplie par le conjugué ("+a+"-"+texRad(b,m)+")."};
+}
+
+/* ---------- Entraînement ---------- */
+const streak={simplify:0,addsub:0,product:0,distrib:0,conjugates:0,squares:0,rationalizeA:0,rationalizeB:0}, awarded=new Set();
+function badge(kind){ if(streak[kind]>=5 && !awarded.has(kind)){ const id={simplify:'btn-simplify',addsub:'btn-addsub',product:'btn-product',distrib:'btn-distrib',conjugates:'btn-conj',squares:'btn-square',rationalizeA:'btn-rA',rationalizeB:'btn-rB'}[kind]; const b=document.createElement('span'); b.className='badge'; b.textContent='✓'; const btn=document.getElementById(id); if(btn && !btn.querySelector('.badge')) btn.appendChild(b); awarded.add(kind);} }
+function makeQ(kind){return({simplify:qSimplify,addsub:qAddSub,product:qProduct,distrib:qDistrib,conjugates:qConjugates,squares:qSquares,rationalizeA:qRatA,rationalizeB:qRatB})[kind]();}
+function spawnTrainer(kind){
+  const zone=$('#trainerZone'); zone.innerHTML='';
+  const q=makeQ(kind); const card=document.createElement('div'); card.className='card';
+  card.innerHTML=`
+    <h3>${({simplify:'Simplifier',addsub:'Addition/Soustraction',product:'Produits',distrib:'Distributivité',conjugates:'Conjugués & binômes',squares:'Carrés de binômes',rationalizeA:'Rationaliser — A',rationalizeB:'Rationaliser — B'})[kind]}</h3>
+    <div class="qa"><div style="min-width:2rem">Q:</div><div id="qtex">${q.texQ}</div></div>
+    <div class="qa">
+      <div style="min-width:2rem">R:</div>
+      <input type="text" placeholder="Ta réponse simplifiée...">
+      <button class="btn mini key-sqrt" onclick="insertSqrt(this)">√</button>
+      <button class="btn mini" data-kind="${kind}" onclick="checkTrainer(this)">Vérifier</button>
+      <button class="btn mini" onclick="newQ(this,'${kind}')">🔁</button>
+    </div>
+    <div class="hint">Astuce: ${q.hint}</div>
+    <div class="hint" data-val="${q.val}" data-kind="${kind}" data-ans="${q.ansText||''}" data-rat="${q.rationalize?1:0}"></div>`;
+  zone.appendChild(card); MathJax.typesetPromise();
+}
+function clearFeed(card){ card.querySelectorAll('.ok,.err').forEach(n=>n.remove()); card.querySelectorAll('.hint').forEach((h,i)=>{if(i>1&&!h.dataset.val)h.remove();}); }
+function newQ(btn,kind){const card=btn.closest('.card'); clearFeed(card); const q=makeQ(kind); $('#qtex',card).innerHTML=q.texQ; const H=card.querySelectorAll('.hint')[1]; H.dataset.val=q.val;H.dataset.kind=kind;H.dataset.ans=q.ansText||'';H.dataset.rat=q.rationalize?1:0; card.querySelector('input').value=''; card.querySelector('.hint').textContent='Astuce: '+q.hint; const v=card.querySelector('[data-kind]'); v.disabled=false; v.textContent='Vérifier'; MathJax.typesetPromise();}
+function checkTrainer(btn){
+  const card=btn.closest('.card'), inp=card.querySelector('input'), info=card.querySelectorAll('.hint')[1]; clearFeed(card);
+  let ok=false; try{
+    ok=numEq(evaluate(inp.value),parseFloat(info.dataset.val));
+    if(['simplify','addsub','product','squares','conjugates','distrib'].includes(info.dataset.kind)) ok=ok&&isSimplified(inp.value);
+    if(info.dataset.kind==='addsub' || info.dataset.kind==='distrib' || info.dataset.kind==='squares') ok=ok&&isReduced(inp.value);
+    if(info.dataset.rat==='1') ok=ok&&!hasRadDen(inp.value);
+  }catch(e){ok=false;}
+  const m=document.createElement('div'); m.className=ok?'ok':'err'; m.textContent= ok?'Bravo ! Réponse correcte.':'Ce n\'est pas tout à fait ça.'; card.appendChild(m);
+  if(ok){ shoot(); streak[info.dataset.kind]++; badge(info.dataset.kind); btn.disabled=true; btn.textContent='✅ Correct'; }
+  else{ streak[info.dataset.kind]=0; const h=document.createElement('div'); h.className='hint'; h.innerHTML='Bonne réponse : $'+(info.dataset.ans||'(forme réduite attendue)')+'$'; card.appendChild(h); }
+  MathJax.typesetPromise();
+}
+
+/* ---------- Évaluation ---------- */
+let exam=null, examTimer=null, examStart=0;
+function startExam(){
+  if(!$('#studentName').value.trim()){alert('Merci d\'indiquer ton nom.');return;}
+  clearInterval(examTimer); $('#timerText').textContent='00:00'; examStart=Date.now();
+  examTimer=setInterval(()=>{$('#timerText').textContent=new Date(Date.now()-examStart).toISOString().substr(14,5);},250);
+  buildExam(); $('#regenExam').disabled=false; $('#downloadDiploma').disabled=true; $('#examReport').classList.add('hidden'); $('#scoreText').textContent='Score: 0/12';$('#submitBtn').disabled = false;
+}
+function regenExam(){ clearInterval(examTimer); $('#timerText').textContent='00:00'; examStart=Date.now(); examTimer=setInterval(()=>{$('#timerText').textContent=new Date(Date.now()-examStart).toISOString().substr(14,5);},250); buildExam(); $('#downloadDiploma').disabled=true; $('#examReport').classList.add('hidden'); $('#scoreText').textContent='Score: 0/12';$('#submitBtn').disabled = false;}
+function buildExam(){
+  const kinds=['simplify','addsub','product','distrib','conjugates','squares','simplify','product','conjugates','squares','rationalizeA','rationalizeB'];
+  exam=kinds.map(k=>makeQ(k));
+  const area=$('#examArea'); area.innerHTML='';
+  exam.forEach((q,i)=>{ const d=document.createElement('div'); d.className='card'; d.innerHTML=`
+     <div class="qa"><span class="pill">Q${i+1}</span><span class="pill">${({simplify:'Simplifier',addsub:'Add/Sous',product:'Produit',distrib:'Distrib.',conjugates:'Conjugués',squares:'Carré',rationalizeA:'Rat. A',rationalizeB:'Rat. B'})[q.type]}</span></div>
+     <div id="q${i}" style="margin:.5rem 0">${q.texQ}</div>
+     <div class="qa"><input type="text" placeholder="Réponse simplifiée"><button class="btn mini key-sqrt" onclick="insertSqrt(this)">√</button></div>
+     <div class="hint hidden" id="corr${i}"></div>`; area.appendChild(d);});
+  MathJax.typesetPromise();
+}
+function submitExam(){
+  if(!exam){alert('Lance d\'abord l\'évaluation.');return;}
+  clearInterval(examTimer);
+  const inputs=$$('#examArea input'); let score=0; const report=$('#reportList'); report.innerHTML='';
+  exam.forEach((q,i)=>{
+    const user=inputs[i].value||''; let ok=false;
+    try{ ok=q.check(user);}catch(e){ok=false;}
+    if(ok) score++;
+    const corr=$('#corr'+i); corr.classList.remove('hidden'); corr.innerHTML= ok?'<span class="ok">✓ Correct</span>':'<span class="err">✗ Incorrect</span>';
+    const shown = ok ? ('$'+user+'$') : ('$'+(q.ansText||'(forme réduite attendue)')+'$');
+    const li=document.createElement('div'); li.className='item';
+    li.innerHTML=`<div style="display:flex;justify-content:space-between"><div>Q${i+1} — ${({simplify:'Simplifier',addsub:'Add/Sous',product:'Produit',distrib:'Distrib.',conjugates:'Conjugués',squares:'Carré',rationalizeA:'Rat. A',rationalizeB:'Rat. B'})[q.type]}</div><div class="${ok?'ok':'err'}">${ok?'✓':'✗'}</div></div>
+      <div>Énoncé : ${q.texQ}</div><div>Ta réponse : ${user?user:'(vide)'}</div><div>Bonne réponse : ${shown}</div>`;
+    report.appendChild(li);
+  });
+  $('#examReport').classList.remove('hidden');
+  $('#scoreText').textContent=`Score: ${score}/${exam.length}`;
+  const minScore=Math.ceil(0.83*exam.length);
+  $('#downloadDiploma').disabled = !(score>=minScore);
+  MathJax.typesetPromise();
+}
+function showAnswers(){
+  if(!exam){alert('Pas d\'évaluation en cours.');return;}
+
+  clearInterval(examTimer);
+  $('#submitBtn').disabled = true;
+
+  $('#examReport').classList.remove('hidden');
+  if($('#reportList').innerHTML.trim()===''){
+    exam.forEach((q,i)=>{ const li=document.createElement('div'); li.className='item';
+      li.innerHTML=`<div>Q${i+1} — Bonne réponse : ${q.ansText?('$'+q.ansText+'$'):'(forme réduite attendue)'} </div>`;
+      $('#reportList').appendChild(li);
+    });
+    MathJax.typesetPromise();
+  }
+}
+function downloadDiploma(){
+  const name=$('#studentName').value.trim(); if(!name){alert('Nom requis.');return;}
+  if($('#downloadDiploma').disabled) return;
+  const canvas=document.createElement('canvas'); canvas.width=1400; canvas.height=1000; const c=canvas.getContext('2d');
+  const g=c.createLinearGradient(0,0,0,1000); g.addColorStop(0,'#0b0f1e'); g.addColorStop(1,'#14234a'); c.fillStyle=g; c.fillRect(0,0,1400,1000);
+  c.strokeStyle='#7c5cff'; c.lineWidth=8; c.strokeRect(40,40,1320,920);
+  c.fillStyle='#e8ecff'; c.font='bold 64px Segoe UI'; c.fillText('DIPLÔME — Racines carrées', 280, 160);
+  c.font='bold 56px Segoe UI'; c.fillStyle='#ffffff'; c.fillText(name, 280, 320);
+  c.font='32px Segoe UI'; c.fillStyle='#d7dfff';
+  c.fillText('Score : '+$('#scoreText').textContent.replace('Score: ',''), 280, 380);
+  c.fillText('Temps : '+$('#timerText').textContent, 280, 430);
+  c.fillText('Date : '+new Date().toLocaleString('fr-BE'), 280, 480);
+  const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='Diplome_Racines_'+name.replace(/\s+/g,'_')+'.png'; a.click();
+}
+
+/* démarrage */
+setTimeout(()=>spawnTrainer('simplify'),150);
+</script>
+</body>
+</html>
