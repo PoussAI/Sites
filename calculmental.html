@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>De Zéro à Héro : Calcul Mental</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Styles Généraux --- */
+        :root {
+            --primary-color: #4CAF50; /* Vert */
+            --primary-dark: #388E3C;
+            --secondary-color: #FFC107; /* Jaune / Or */
+            --accent-color: #007bff; /* Bleu */
+            --accent-dark: #0056b3;
+            --error-color: #dc3545; /* Rouge */
+            --error-light: #f8d7da;
+            --success-color: #28a745;
+            --success-light: #d4edda;
+            --text-color: #343a40;
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            font-family: "Poppins", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 25px 30px;
+            background: linear-gradient(135deg, var(--bg-white) 0%, #f1f8e9 100%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            flex-grow: 1;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Roboto Slab', serif;
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 0.8em;
+        }
+        h1 {
+            font-size: 2.2em;
+            color: var(--primary-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* --- Sections Management --- */
+        section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Input & Forms Styling --- */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input[type="text"].large-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            font-size: 1.1em;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            transition: border-color 0.3s;
+            text-align: center;
+        }
+        input[type="text"].large-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #555;
+            display: block;
+        }
+
+        .option-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .option-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+        .option-card input {
+            accent-color: var(--primary-color);
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .option-card label {
+            cursor: pointer;
+            flex-grow: 1;
+            text-align: left;
+            font-weight: 600;
+        }
+        .option-card small {
+            display: block;
+            color: #888;
+            font-weight: normal;
+            font-size: 0.85em;
+        }
+
+        /* --- Buttons --- */
+        button.action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            margin: 10px 5px;
+            display: inline-block;
+        }
+        button.action-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        button.action-button:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .grid-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* --- Quiz Area --- */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out, background-color 0.3s;
+        }
+        .progress-fill.blitz {
+            background: linear-gradient(90deg, var(--secondary-color), var(--error-color));
+            width: 100%;
+        }
+
+        .question-area {
+            font-size: 2.5em;
+            font-family: 'Roboto Slab', serif;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 10px;
+            color: var(--primary-dark);
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .timer-display {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--secondary-color);
+            background: #fff3cd;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 0;
+            border: 1px solid var(--secondary-color);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Streak Styles */
+        .streak-badge {
+            background-color: #fff3cd;
+            color: #ff5722;
+            border: 1px solid #ffccbc;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s, opacity 0.3s;
+            opacity: 0; /* Hidden by default if 0 */
+        }
+        .streak-badge.visible {
+            opacity: 1;
+        }
+        .streak-badge.pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .answer-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* --- Feedback & History --- */
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1em;
+            min-height: 20px;
+            display: none; /* hidden by default */
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .feedback.show { display: flex; animation: fadeIn 0.3s; }
+        .feedback.correct { background-color: var(--success-light); color: var(--success-color); border: 1px solid var(--success-color); }
+        .feedback.incorrect { background-color: var(--error-light); color: var(--error-color); border: 1px solid var(--error-color); }
+
+        .history-container {
+            margin-top: 30px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: left;
+        }
+        .history-list {
+            list-style: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-item.correct span.result { color: var(--success-color); font-weight: bold; }
+        .history-item.incorrect span.result { color: var(--error-color); font-weight: bold; }
+
+        /* --- Leaderboard Styles --- */
+        .leaderboard-container {
+            margin-top: 20px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.95em;
+        }
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        .leaderboard-table th {
+            background-color: #f1f8e9;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        .rank-1 { color: #FFD700; font-weight: bold; font-size: 1.2em; }
+        .rank-2 { color: #C0C0C0; font-weight: bold; font-size: 1.1em; }
+        .rank-3 { color: #CD7F32; font-weight: bold; font-size: 1.1em; }
+        
+        .mode-badge {
+            font-size: 0.8em;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .mode-std { background-color: #e3f2fd; color: #1565c0; }
+        .mode-blitz { background-color: #ffebee; color: #c62828; }
+
+        /* --- Audio Button & Confetti --- */
+        #sound-control { position: fixed; top: 15px; right: 15px; background-color: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-color); border-radius: 50%; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.5em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; transition: background-color 0.3s ease; }
+        #sound-control:hover { background-color: white; transform: scale(1.1); }
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { margin: 10px; padding: 15px; }
+            .question-area { font-size: 1.8em; }
+            h1 { font-size: 1.5em; }
+            .grid-buttons { flex-direction: column; }
+            button.action-button { width: 100%; margin: 5px 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sound Control -->
+    <button id="sound-control" onclick="toggleSound()">&#x1F50A;</button>
+    
+    <!-- Canvas for Confetti -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1>&#x1F9E9; De Zéro à Héro : Calcul Mental</h1>
+        </header>
+
+        <!-- SECTION 1: SETUP (Nom, Niveau, Options) -->
+        <section id="setup-section" class="active">
+            <h2>Configuration</h2>
+            
+            <div class="form-group">
+                <label for="userName" style="font-weight:600; display:block; margin-bottom:10px;">Ton prénom :</label>
+                <input type="text" id="userName" class="large-input" placeholder="Ex: Thomas">
+            </div>
+
+            <div style="text-align: left; max-width: 450px; margin: 0 auto;">
+                
+                <span class="section-title">&#x1F3AE; Mode de Jeu :</span>
+                <div class="option-card" onclick="selectRadio('mode', 'standard')">
+                    <input type="radio" name="mode" value="standard" id="mode_standard" checked>
+                    <label for="mode_standard">Entraînement <small>20 questions, prends ton temps.</small></label>
+                </div>
+                <div class="option-card" onclick="selectRadio('mode', 'blitz')">
+                    <input type="radio" name="mode" value="blitz" id="mode_blitz">
+                    <label for="mode_blitz">Blitz 60s &#x26A1; <small>Course contre la montre ! Max de calculs en 1 minute.</small></label>
+                </div>
+
+                <br>
+
+                <span class="section-title">&#x1F4CA; Difficulté :</span>
+                <div class="option-card" onclick="selectRadio('level', 'faible')">
+                    <input type="radio" name="level" value="faible" id="lvl_faible" checked>
+                    <label for="lvl_faible">Débutant <small>(2 à 10)</small></label>
+                </div>
+                
+                <div class="option-card" onclick="selectRadio('level', 'intermediaire')">
+                    <input type="radio" name="level" value="intermediaire" id="lvl_inter">
+                    <label for="lvl_inter">Intermédiaire <small>(2 à 20)</small></label>
+                </div>
+                
+                <div class="option-card" onclick="selectRadio('level', 'avance')">
+                    <input type="radio" name="level" value="avance" id="lvl_avance">
+                    <label for="lvl_avance">Avancé <small>(2 à 50)</small></label>
+                </div>
+
+                <div class="option-card" onclick="toggleCheckbox('allowNegative')">
+                    <input type="checkbox" id="allowNegative">
+                    <label for="allowNegative">Permettre les nombres négatifs &#x2744;&#xFE0F;</label>
+                </div>
+            </div>
+
+            <br>
+            <div style="text-align:center;">
+                <button class="action-button" onclick="goToOperations()">Suivant &#x27A1;&#xFE0F;</button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: OPERATION SELECTION -->
+        <section id="operation-section">
+            <h2>Choisis ta mission</h2>
+            <p>Quel type de calcul veux-tu maîtriser aujourd'hui ?</p>
+            
+            <div class="grid-buttons" style="margin-top: 30px;">
+                <button class="action-button" onclick="startQuiz('+')" style="background-color: #FFC107; color: #333;">Addition (+)</button>
+                <button class="action-button" onclick="startQuiz('-')" style="background-color: #2196F3;">Soustraction (-)</button>
+                <button class="action-button" onclick="startQuiz('*')" style="background-color: #9C27B0;">Multiplication (×)</button>
+                <button class="action-button" onclick="startQuiz('mix')" style="background-color: #607D8B;">Mixte (Aléatoire)</button>
+            </div>
+            
+            <br><br>
+            <button onclick="showSection('setup-section')" style="background:none; border:none; color:#666; cursor:pointer; text-decoration:underline;">&#x2B05;&#xFE0F; Retour</button>
+        </section>
+
+        <!-- SECTION 3: QUIZ AREA -->
+        <section id="quiz-section">
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div id="progressBar" class="progress-fill"></div>
+            </div>
+
+            <div class="quiz-header">
+                <span id="currentQuestionDisplay" style="font-weight:bold; color:#777;">Question 1/20</span>
+                
+                <!-- Streak Display -->
+                <div id="streakDisplay" class="streak-badge">
+                    <span style="font-size:1.2em;">&#x1F525;</span> <span id="streakCount">0</span>
+                </div>
+
+                <span id="timer" class="timer-display">⏱ 0s</span>
+            </div>
+
+            <div id="questionText" class="question-area">? + ?</div>
+
+            <div class="answer-wrapper">
+                <input type="text" id="answerInput" class="large-input" placeholder="Réponse..." inputmode="numeric" pattern="[0-9-]*">
+                <button id="checkButton" class="action-button" onclick="checkAnswer()">Valider</button>
+            </div>
+
+            <div id="resultFeedback" class="feedback"></div>
+        </section>
+
+        <!-- SECTION 4: RESULTS -->
+        <section id="results-section">
+            <h2>&#x1F3C6; Résultats</h2>
+            
+            <div style="background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid var(--primary-color);">
+                <h3 id="finalMessage" style="color: var(--primary-color);">Bravo !</h3>
+                <p id="summary" style="font-size: 1.2em;">Score...</p>
+            </div>
+            
+            <div class="leaderboard-container">
+                <h4>&#x1F451; Tableau des Scores</h4>
+                <div id="leaderboardList"></div>
+            </div>
+
+            <div class="history-container">
+                <h4>&#x1F4DC; Historique des réponses</h4>
+                <ul id="historyList" class="history-list"></ul>
+            </div>
+
+            <br>
+            <div class="grid-buttons">
+                <button class="action-button" onclick="restartQuiz()">&#x1F504; Recommencer</button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer style="text-align: center; padding: 15px; margin-top: 20px; font-size: 0.9em; color: #777;">
+        De Zéro à Héro : Calcul Mental - 2026
+    </footer>
+
+    <script>
+        /* --- STATE VARIABLES --- */
+        let userName = '';
+        let levelSelected = 'faible';
+        let gameMode = 'standard'; // 'standard' or 'blitz'
+        let allowNegative = false;
+        let selectedOperation = '';
+        
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+        let currentStreak = 0;
+        let timerInterval;
+        let timeValue = 0; // Counts up in Standard, Counts down in Blitz
+        let quizFinished = false;
+        
+        const TOTAL_QUESTIONS_STD = 20;
+        const BLITZ_DURATION = 60; // seconds
+
+        /* --- AUDIO & UTILS --- */
+        let audioCtx;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } 
+                catch (e) { console.warn("Audio API not supported"); soundEnabled = false; updateSoundButton(); }
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            const now = audioCtx.currentTime;
+            gain.gain.setValueAtTime(0.1, now);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'incorrect') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+        }
+
+        function toggleSound() {
+            initAudio();
+            soundEnabled = !soundEnabled;
+            updateSoundButton();
+            if(soundEnabled) playSound('click');
+        }
+
+        function updateSoundButton() {
+            const btn = document.getElementById('sound-control');
+            btn.innerHTML = soundEnabled ? '&#x1F50A;' : '&#x1F507;';
+        }
+
+        /* --- CONFETTI LOGIC --- */
+        let confettiInterval = null;
+        function startConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const colors = ['#4CAF50', '#FFC107', '#2196F3', '#E91E63', '#9C27B0'];
+            
+            // Reduced confetti from 150 to 60
+            for(let i=0; i<60; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speed: Math.random() * 3 + 2,
+                    angle: Math.random() * 6.28,
+                    spin: Math.random() * 0.2 - 0.1
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    p.angle += p.spin;
+                    p.x += Math.sin(p.angle) * 0.5;
+                    
+                    if(p.y > canvas.height) {
+                        p.y = -10;
+                        p.x = Math.random() * canvas.width;
+                    }
+                    
+                    ctx.fillStyle = p.color;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.angle);
+                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                    ctx.restore();
+                });
+            }
+            
+            if(confettiInterval) clearInterval(confettiInterval);
+            confettiInterval = setInterval(draw, 20);
+        }
+
+        function stopConfetti() {
+            if(confettiInterval) clearInterval(confettiInterval);
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        /* --- NAVIGATION --- */
+        function showSection(id) {
+            initAudio();
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        /* --- UI HELPERS --- */
+        function selectRadio(name, value) {
+            const radios = document.getElementsByName(name);
+            for(let r of radios) {
+                if(r.value === value) r.checked = true;
+            }
+        }
+        function toggleCheckbox(id) {
+            const cb = document.getElementById(id);
+            cb.checked = !cb.checked;
+        }
+
+        /* --- QUIZ LOGIC --- */
+        function goToOperations() {
+            const nameInput = document.getElementById('userName');
+            if(!nameInput.value.trim()) {
+                alert("Entre ton prénom pour continuer !");
+                nameInput.focus();
+                return;
+            }
+            userName = nameInput.value.trim();
+            
+            // Get Mode
+            const modeRadios = document.getElementsByName('mode');
+            for(let r of modeRadios) { if(r.checked) gameMode = r.value; }
+
+            // Get Level
+            const lvlRadios = document.getElementsByName('level');
+            for(let r of lvlRadios) { if(r.checked) levelSelected = r.value; }
+            
+            // Get Negative
+            allowNegative = document.getElementById('allowNegative').checked;
+            
+            playSound('click');
+            showSection('operation-section');
+        }
+
+        function startQuiz(op) {
+            selectedOperation = op;
+            currentQuestion = 0;
+            correctAnswers = 0;
+            currentStreak = 0;
+            updateStreakUI();
+            
+            quizFinished = false;
+            document.getElementById('historyList').innerHTML = '';
+            
+            // Setup Timer based on mode
+            if (gameMode === 'standard') {
+                timeValue = 0;
+                document.getElementById('progressBar').className = 'progress-fill'; // Standard color
+                document.getElementById('progressBar').style.width = '0%';
+            } else {
+                timeValue = BLITZ_DURATION;
+                document.getElementById('progressBar').className = 'progress-fill blitz'; // Blitz color
+                document.getElementById('progressBar').style.width = '100%';
+            }
+
+            playSound('click');
+            startTimer();
+            showSection('quiz-section');
+            nextQuestion();
+        }
+
+        function updateStreakUI() {
+            const el = document.getElementById('streakDisplay');
+            const countEl = document.getElementById('streakCount');
+            countEl.innerText = currentStreak;
+            
+            if (currentStreak > 1) {
+                el.classList.add('visible');
+                el.classList.add('pulse');
+                setTimeout(() => el.classList.remove('pulse'), 500);
+            } else {
+                el.classList.remove('visible');
+            }
+        }
+
+        function updateProgressBar() {
+            const bar = document.getElementById('progressBar');
+            if (gameMode === 'standard') {
+                // Progress based on question number (e.g. 5/20)
+                // Note: currentQuestion starts at 1
+                const percent = ((currentQuestion - 1) / TOTAL_QUESTIONS_STD) * 100;
+                bar.style.width = `${percent}%`;
+            } else {
+                // Progress based on time remaining
+                const percent = (timeValue / BLITZ_DURATION) * 100;
+                bar.style.width = `${percent}%`;
+            }
+        }
+
+        function startTimer() {
+            if(timerInterval) clearInterval(timerInterval);
+            
+            const timerEl = document.getElementById('timer');
+            
+            if (gameMode === 'standard') {
+                timerEl.innerText = `⏱ 0s`;
+                timerInterval = setInterval(() => {
+                    if (quizFinished) return;
+                    timeValue++;
+                    timerEl.innerText = `⏱ ${timeValue}s`;
+                }, 1000);
+            } else {
+                // Blitz Mode (Count down)
+                timerEl.innerText = `⏱ ${timeValue}s`;
+                timerInterval = setInterval(() => {
+                    if (quizFinished) return;
+                    timeValue--;
+                    timerEl.innerText = `⏱ ${timeValue}s`;
+                    updateProgressBar();
+                    
+                    if (timeValue <= 0) {
+                        endQuiz();
+                    }
+                }, 1000);
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function getRandomNumber() {
+            let min = 2, max = 10;
+            if (levelSelected === 'intermediaire') max = 20;
+            if (levelSelected === 'avance') max = 50;
+
+            const generate = () => {
+                let val = Math.floor(Math.random() * (max - min + 1)) + min;
+                return val;
+            };
+
+            let val = generate();
+
+            // Réduction de la fréquence des 2, 3 et 10 (re-tirage)
+            if (val === 2 || val === 3 || val === 10) {
+                if (Math.random() < 0.8) { 
+                    val = generate();
+                }
+            }
+
+            if (allowNegative) {
+                let isNeg = Math.random() < 0.5;
+                return isNeg ? -val : val;
+            } else {
+                return val;
+            }
+        }
+
+        function nextQuestion() {
+            // Check limits for Standard Mode
+            if (gameMode === 'standard' && currentQuestion >= TOTAL_QUESTIONS_STD) {
+                endQuiz();
+                return;
+            }
+
+            currentQuestion++;
+            
+            // Update Display
+            if (gameMode === 'standard') {
+                document.getElementById('currentQuestionDisplay').innerText = `Question ${currentQuestion}/${TOTAL_QUESTIONS_STD}`;
+                updateProgressBar(); // Moves bar forward
+            } else {
+                document.getElementById('currentQuestionDisplay').innerText = `Question ${currentQuestion} (Blitz)`;
+                // ProgressBar updated by timer in Blitz
+            }
+            
+            // Hide feedback
+            const feedbackEl = document.getElementById('resultFeedback');
+            feedbackEl.className = 'feedback';
+            feedbackEl.innerText = '';
+
+            // Reset Input
+            const input = document.getElementById('answerInput');
+            input.value = '';
+            input.disabled = false;
+            document.getElementById('checkButton').disabled = false;
+            input.focus();
+
+            // Generate Numbers
+            let n1 = getRandomNumber();
+            let n2 = getRandomNumber();
+            let opSymbol = '';
+            let ans = 0;
+
+            // Determine Operation
+            let op = selectedOperation;
+            if (op === 'mix') {
+                const ops = ['+', '-', '*'];
+                op = ops[Math.floor(Math.random() * ops.length)];
+            }
+
+            switch(op) {
+                case '+':
+                    opSymbol = '+';
+                    ans = n1 + n2;
+                    break;
+                case '-':
+                    opSymbol = '-';
+                    if (!allowNegative) {
+                        if (n1 < n2) [n1, n2] = [n2, n1];
+                        while(n1 === n2) {
+                             n2 = getRandomNumber();
+                             if(n1 < n2) [n1, n2] = [n2, n1];
+                        }
+                    }
+                    ans = n1 - n2;
+                    break;
+                case '*':
+                    opSymbol = '×';
+                    ans = n1 * n2;
+                    break;
+            }
+
+            // Correction de l'affichage: (-2) -> -2 pour le premier nombre
+            let n1Str = `${n1}`; 
+            // Parenthèses pour le second si négatif
+            let n2Str = n2 < 0 ? `(${n2})` : `${n2}`;
+            
+            const qText = `${n1Str} ${opSymbol} ${n2Str}`;
+            const qDisplay = document.getElementById('questionText');
+            qDisplay.innerText = qText;
+            qDisplay.dataset.ans = ans;
+        }
+
+        function checkAnswer() {
+            if(quizFinished) return;
+            const input = document.getElementById('answerInput');
+            const userVal = input.value.trim();
+            const correctVal = parseInt(document.getElementById('questionText').dataset.ans);
+            const feedback = document.getElementById('resultFeedback');
+            const qText = document.getElementById('questionText').innerText;
+
+            if (userVal === '') {
+                input.style.borderColor = 'red';
+                setTimeout(() => input.style.borderColor = '#dee2e6', 500);
+                return;
+            }
+
+            const userInt = parseInt(userVal);
+            let isCorrect = (userInt === correctVal);
+
+            // Disable input temporarily
+            input.disabled = true;
+            document.getElementById('checkButton').disabled = true;
+
+            // UI Feedback
+            if (isCorrect) {
+                correctAnswers++;
+                currentStreak++; 
+                feedback.innerHTML = `&#x2705; Correct !`;
+                feedback.className = 'feedback show correct';
+                playSound('correct');
+            } else {
+                currentStreak = 0; 
+                feedback.innerHTML = `&#x274C; Faux ! La réponse était <strong>${correctVal}</strong>`;
+                feedback.className = 'feedback show incorrect';
+                playSound('incorrect');
+            }
+            updateStreakUI();
+
+            // Add to history
+            const li = document.createElement('li');
+            li.className = `history-item ${isCorrect ? 'correct' : 'incorrect'}`;
+            li.innerHTML = `
+                <span>${qText} = <span class="result">${userVal}</span></span>
+                <span>${isCorrect ? '✔' : `(Sol: ${correctVal})`}</span>
+            `;
+            document.getElementById('historyList').appendChild(li);
+
+            // Next Question Delay
+            // Blitz should be faster? Let's keep it snappy (0.8s) for Blitz, 1.5s for Standard
+            const delay = gameMode === 'blitz' ? 800 : 1500;
+            
+            setTimeout(() => {
+                // Fill progress bar to 100% just before leaving last question in standard
+                if (gameMode === 'standard' && currentQuestion === TOTAL_QUESTIONS_STD) {
+                     document.getElementById('progressBar').style.width = '100%';
+                }
+                nextQuestion();
+            }, delay);
+        }
+
+        // Add Enter key support
+        document.getElementById('answerInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkAnswer();
+        });
+
+        /* --- LEADERBOARD LOGIC --- */
+        const LEADERBOARD_KEY = 'math_hero_leaderboard_v2';
+
+        function saveHighScore(name, score, timeOrQuestions, mode) {
+            let scores = [];
+            try { scores = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || []; } catch(e) {}
+            
+            scores.push({ 
+                name: name, 
+                score: score, 
+                metric: timeOrQuestions, // Time for Std, Questions for Blitz?
+                // Actually:
+                // Standard: Score / 20, Metric = Time taken (lower better)
+                // Blitz: Score (higher better), Metric = 60s (fixed)
+                mode: mode,
+                date: new Date().toLocaleDateString() 
+            });
+            
+            // Sort: 
+            // 1. Blitz scores (Higher score is better)
+            // 2. Standard scores (Higher score is better, then Lower Time is better)
+            // It's easier to just sort by Score Descending generally, but separating logic is cleaner.
+            
+            scores.sort((a, b) => {
+                // If modes differ, just keep order or group? Let's verify score first.
+                if (b.score !== a.score) return b.score - a.score;
+                // If same score
+                if (a.mode === 'standard' && b.mode === 'standard') return a.metric - b.metric; // Lower time wins
+                return 0; 
+            });
+            
+            // Keep top 5
+            scores = scores.slice(0, 5);
+            localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(scores));
+        }
+
+        function renderLeaderboard() {
+            let scores = [];
+            try { scores = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || []; } catch(e) {}
+            
+            const container = document.getElementById('leaderboardList');
+            if (scores.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#777; font-style:italic;">Aucun champion pour le moment.</p>';
+                return;
+            }
+            
+            let html = '<table class="leaderboard-table"><thead><tr><th>#</th><th>Nom</th><th>Mode</th><th>Score</th></tr></thead><tbody>';
+            scores.forEach((s, index) => {
+                let rankClass = '';
+                if(index === 0) rankClass = 'rank-1';
+                else if(index === 1) rankClass = 'rank-2';
+                else if(index === 2) rankClass = 'rank-3';
+
+                let modeLabel = s.mode === 'blitz' ? '<span class="mode-badge mode-blitz">Blitz</span>' : '<span class="mode-badge mode-std">Entr.</span>';
+                let scoreDetail = s.mode === 'blitz' ? `${s.score} pts` : `${s.score}/20`;
+                let timeDetail = s.mode === 'blitz' ? '' : `<br><small>${s.metric}s</small>`;
+
+                html += `<tr>
+                    <td class="${rankClass}">${index + 1}</td>
+                    <td style="font-weight:600;">${s.name}</td>
+                    <td>${modeLabel}</td>
+                    <td>${scoreDetail}${timeDetail}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function endQuiz() {
+            quizFinished = true;
+            stopTimer();
+            
+            let finalMetric = gameMode === 'standard' ? timeValue : 60;
+            saveHighScore(userName, correctAnswers, finalMetric, gameMode);
+
+            showSection('results-section');
+            renderLeaderboard();
+            
+            const scoreEl = document.getElementById('summary');
+            const msgEl = document.getElementById('finalMessage');
+            
+            if (gameMode === 'standard') {
+                scoreEl.innerHTML = `Score : <strong>${correctAnswers} / ${TOTAL_QUESTIONS_STD}</strong> <br> Temps : ${timeValue} secondes`;
+                
+                if (correctAnswers >= 18) {
+                    msgEl.innerHTML = `&#x1F389; Excellent ${userName} !`;
+                    startConfetti();
+                    playSound('correct');
+                } else if (correctAnswers >= 12) {
+                    msgEl.innerHTML = `&#x1F44D; Bien joué ${userName} !`;
+                } else {
+                    msgEl.innerHTML = `&#x1F4AA; Courage ${userName}, continue de t'entraîner !`;
+                }
+            } else {
+                // Blitz Result
+                scoreEl.innerHTML = `Mode Blitz Terminé !<br>Calculs réussis : <strong>${correctAnswers}</strong>`;
+                if (correctAnswers >= 15) {
+                    msgEl.innerHTML = `&#x26A1; Vitesse Lumière, ${userName} !`;
+                    startConfetti();
+                    playSound('correct');
+                } else if (correctAnswers >= 8) {
+                    msgEl.innerHTML = `&#x1F3C3; Rapide comme l'éclair !`;
+                } else {
+                    msgEl.innerHTML = `&#x1F525; Pas mal, essaie de battre ton record !`;
+                }
+            }
+        }
+
+        function restartQuiz() {
+            stopConfetti();
+            playSound('click');
+            currentStreak = 0;
+            showSection('setup-section');
+        }
+
+        // Init
+        window.onload = function() {
+            // Pre-fill if needed
+        };
+
+    </script>
+</body>
+</html>
