@@ -1,0 +1,1198 @@
+<!DOCTYPE html> 
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title> &#x1F680; Les Fractions de zéro à héro &#x1F680; </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Styles Généraux V2 --- */
+        :root {
+            --primary-color: #007bff; /* Bleu vif */
+            --primary-dark: #0056b3;
+            --secondary-color: #ffc107; /* Jaune / Or */
+            --accent-color: #28a745; /* Vert */
+            --accent-dark: #1c7430;
+            --error-color: #dc3545; /* Rouge */
+            --error-light: #f8d7da;
+            --success-color: var(--accent-color);
+            --success-light: #d4edda;
+            --partial-color: #fff3cd; /* Jaune très clair pour partiel */
+            --partial-border: #ffeeba;
+            --text-color: #343a40; /* Gris foncé */
+            --bg-light: #f8f9fa; /* Gris très clair */
+            --bg-white: #ffffff;
+            --border-color: #dee2e6; /* Gris clair */
+        }
+
+        body {
+            font-family: "Poppins", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden; /* Pour les confettis */
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 25px 30px;
+            background: linear-gradient(135deg, var(--bg-white) 0%, #eef7ff 100%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            flex-grow: 1;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Roboto Slab', serif;
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 1em;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: var(--primary-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        h2 {
+             font-size: 2em;
+             border-bottom: 3px solid var(--primary-color);
+             padding-bottom: 10px;
+             margin-bottom: 1.5em;
+        }
+         h3 {
+             font-size: 1.6em;
+             color: var(--accent-dark);
+             margin-top: 2em;
+             margin-bottom: 1em;
+         }
+
+        nav {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+         nav button.active {
+            background-color: var(--accent-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+         }
+
+        section {
+            display: none;
+            margin-top: 25px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-white);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
+        }
+
+        section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+             from { opacity: 0; transform: translateY(10px); }
+             to { opacity: 1; transform: translateY(0); }
+         }
+
+        hr {
+             border: 0;
+             height: 1px;
+             background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--border-color), rgba(0, 0, 0, 0));
+             margin: 2.5em 0;
+         }
+
+        /* --- Styles pour les Fractions (CORRIGÉ) --- */
+        .interactive-area {
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             flex-wrap: wrap;
+             gap: 15px;
+             margin-bottom: 20px;
+             padding: 15px;
+             background-color: #f8f9fa;
+             border-radius: 8px;
+        }
+
+        /* Structure flexible pour aligner le signe et la fraction */
+        .fraction-group {
+            display: inline-flex;
+            flex-direction: row;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 5px;
+        }
+
+        .fraction-input, .fraction-display {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            position: relative;
+            font-size: 1em;
+        }
+
+        .negative-sign {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--error-color);
+            margin-right: 5px;
+            position: static; 
+            transform: none;
+        }
+
+        /* Correction Bug 1: Input text pour clavier complet sur mobile */
+        .fraction-input input {
+            width: 55px;
+            text-align: center;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 8px 5px;
+            font-size: 1em;
+            transition: border-color 0.2s ease;
+            -moz-appearance: textfield; /* Firefox */
+        }
+        
+        .fraction-input input::-webkit-outer-spin-button,
+        .fraction-input input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .fraction-input input:focus {
+             border-color: var(--primary-color);
+             outline: none;
+             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+         }
+
+        .fraction-line {
+            border-top: 2px solid var(--text-color);
+            width: 100%;
+            margin: 3px 0;
+            min-width: 30px;
+            display: block;
+            height: 0;
+        }
+
+        .operation-symbol {
+            font-size: 1.8em;
+            margin: 0 10px;
+            font-weight: bold;
+            color: var(--primary-dark);
+            vertical-align: middle;
+        }
+        
+        /* Correction Bug Mathématique : Parenthèses pour nombres négatifs */
+        .fraction-paren {
+            font-size: 1.8em;
+            color: var(--text-color);
+            vertical-align: middle;
+            margin: 0 5px;
+            font-weight: normal;
+            line-height: 1;
+        }
+
+        /* Correction Bug 2: Alignement Exposant */
+        .power-symbol {
+            display: inline-flex;
+            align-items: center;
+        }
+        .power-symbol span {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        .power-symbol sup input {
+             width: 45px;
+             font-size: 0.7em !important;
+             padding: 4px !important;
+             position: relative;
+             top: -10px;
+         }
+
+        /* Affichage Puissance généré */
+        .power-display {
+            display: inline-flex;
+            align-items: center;
+        }
+        .power-display .power-base-paren {
+            font-size: 2.2em;
+            font-weight: normal;
+            color: var(--text-color);
+            line-height: 1;
+        }
+        .power-display .fraction-group {
+             margin: 0 -2px;
+             font-size: 1.1em;
+        }
+        .power-display sup {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--primary-dark);
+            position: relative;
+            top: -15px; /* Décalage visuel propre sans casser la ligne */
+            margin-left: 2px;
+        }
+
+        .result-area {
+            margin-top: 0;
+            font-weight: bold;
+            font-size: 1.3em;
+            min-width: 60px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button.calc-button {
+             background-color: var(--accent-color);
+             color: white;
+             border: none;
+             padding: 10px 20px;
+             border-radius: 20px;
+             cursor: pointer;
+             font-size: 1em;
+             font-weight: 600;
+             transition: background-color 0.3s ease;
+             display: block;
+             margin: 15px auto 0 auto;
+             min-width: 200px;
+         }
+         button.calc-button:hover {
+             background-color: var(--accent-dark);
+         }
+
+        .area-model-visu {
+             width: 200px; height: 200px; border: 2px solid var(--text-color);
+             position: relative; background-color: #eee; overflow: hidden; margin: 15px auto;
+        }
+        
+        .division-steps { margin-top: 20px; padding: 15px; border: 1px solid var(--primary-color); background-color: #eef7ff; border-radius: 8px; font-size: 1.1em; }
+        .division-steps .step { margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;}
+        .division-steps .step-label { font-weight: 600; color: var(--primary-dark); min-width: 60px; }
+        .division-steps .fraction-step-display { display: inline-flex; align-items: center; gap: 5px; }
+        .div-step-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 3px; font-weight: bold; }
+        .div-step-frac .line { border-top: 1.5px solid var(--text-color); width: 80%; margin: 1px 0;}
+        .div-step-op { font-size: 1.3em; font-weight: bold; color: var(--primary-dark); margin: 0 8px; }
+
+        .visualization { margin: 25px 0; padding: 20px; border: 2px dashed var(--secondary-color); border-radius: 8px; min-height: 80px; display: flex; align-items: center; justify-content: center; gap: 25px; flex-wrap: wrap; background-color: #fffaf0; position: relative; }
+        .visu-explanation { position: absolute; bottom: 5px; right: 10px; font-size: 0.85em; color: #777; font-style: italic; }
+        .fraction-visu-group { display: flex; flex-direction: column; align-items: center; margin: 10px; }
+        .fraction-visu-bars { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin-bottom: 5px; }
+        .fraction-bar-container { display: flex; flex-direction: column; align-items: center; }
+        .fraction-label { font-size: 1em; color: #555; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+        .fraction-label .visu-neg-sign { font-size: 1.1em; color: var(--error-color); font-weight: bold; }
+        .fraction-bar { width: 180px; height: 35px; border: 1px solid #555; border-radius: 4px; display: flex; background-color: #e9ecef; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .fraction-bar div { height: 100%; box-sizing: border-box; }
+        .numerator-part { background: linear-gradient(135deg, #66bb6a, #43a047); border-right: 1px solid rgba(255, 255, 255, 0.5); }
+        .numerator-part-b { background: linear-gradient(135deg, #42a5f5, #1e88e5); border-right: 1px solid rgba(255, 255, 255, 0.5); }
+        .numerator-part-neg { background: linear-gradient(135deg, #ef5350, #e53935); border-right: 1px solid rgba(255, 255, 255, 0.5); }
+        .denominator-part { background-color: #e9ecef; border-right: 1px solid #ced4da; }
+        .fraction-bar div:last-child { border-right: none; }
+
+        /* --- Styles pour Exercices & Test V2 --- */
+        .quiz-container { text-align: center; }
+        #exercice-operation-selection { margin-bottom: 25px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background-color: #f8f9fa; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        #exercice-operation-selection fieldset { border: none; padding: 0; margin: 0; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        #exercice-operation-selection legend { font-weight: 600; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-dark); text-align: center; width: 100%; }
+        #exercice-operation-selection label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 1em; }
+        #exercice-operation-selection input[type="checkbox"] { cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary-color); }
+
+        .quiz-controls { margin-bottom: 25px; display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .advanced-switch { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.95em; }
+        .advanced-switch input[type="checkbox"] { appearance: none; width: 40px; height: 20px; background-color: #ccc; border-radius: 10px; position: relative; cursor: pointer; transition: background-color 0.3s ease; }
+        .advanced-switch input[type="checkbox"]::before { content: ""; width: 16px; height: 16px; background-color: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s ease; }
+        .advanced-switch input[type="checkbox"]:checked { background-color: var(--accent-color); }
+        .advanced-switch input[type="checkbox"]:checked::before { transform: translateX(20px); }
+
+        .question-area {
+            font-size: 1.6em;
+            margin-bottom: 25px;
+            padding: 15px 25px;
+            background-color: #eef7ff;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+            gap: 10px;
+        }
+        .question-area .operation-symbol {
+             line-height: 1;
+        }
+
+        .answer-area { margin-bottom: 25px; display: flex; justify-content: center; align-items: center; gap: 15px; }
+        .answer-area button { background-color: var(--primary-color); padding: 10px 25px; border-radius: 20px; color: white; border: none; cursor: pointer; font-size: 1em; font-weight: 600; transition: background-color 0.3s ease; }
+        .answer-area button:hover { background-color: var(--primary-dark); }
+
+        .timer { font-size: 1.3em; margin-bottom: 20px; color: var(--error-color); font-weight: 600; background-color: #fff3cd; padding: 5px 15px; border-radius: 15px; display: inline-block; border: 1px solid var(--secondary-color); transition: color 0.3s ease, border-color 0.3s ease; }
+        .score { font-size: 1.2em; margin-top: 20px; font-weight: bold; color: var(--primary-dark); display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;}
+        
+        /* Nouveau style pour la série (Streak) */
+        .streak-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #ff8c00;
+            background-color: #fffaf0;
+            padding: 2px 10px;
+            border-radius: 10px;
+            border: 1px solid #ffeeba;
+            font-size: 0.9em;
+        }
+        .streak-icon { font-size: 1.2em; animation: flame 1s infinite alternate; }
+        @keyframes flame { from { transform: scale(1); filter: brightness(100%); } to { transform: scale(1.2); filter: brightness(120%); } }
+
+         .feedback { margin-top: 20px; padding: 15px 20px; border-radius: 8px; font-weight: 600; min-height: 50px; font-size: 1.1em; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+         .feedback.correct { color: var(--accent-dark); background-color: var(--success-light); border: 1px solid var(--accent-color); animation: tada 0.8s ease; }
+         .feedback.correct::before { content: '\2705'; font-size: 1.3em; } /* ✅ */
+         .feedback.incorrect { color: #721c24; background-color: var(--error-light); border: 1px solid var(--error-color); animation: headShake 0.6s ease; }
+         .feedback.incorrect::before { content: '\274C'; font-size: 1.3em; } /* ❌ */
+        .feedback.partial { color: #856404; background-color: var(--partial-color); border: 1px solid var(--partial-border); animation: pulse 1.5s ease-in-out; }
+        .feedback.partial::before { content: '\26A0\FE0F'; font-size: 1.3em; } /* ⚠️ */
+
+         @keyframes tada { from { transform: scale3d(1, 1, 1); } 10%, 20% { transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg); } 30%, 50%, 70%, 90% { transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg); } 40%, 60%, 80% { transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg); } to { transform: scale3d(1, 1, 1); } }
+         @keyframes headShake { 0% { transform: translateX(0); } 6.5% { transform: translateX(-6px) rotateY(-9deg); } 18.5% { transform: translateX(5px) rotateY(7deg); } 31.5% { transform: translateX(-3px) rotateY(-5deg); } 43.5% { transform: translateX(2px) rotateY(3deg); } 50% { transform: translateX(0); } }
+
+        .feedback-log-container { margin-top: 30px; padding: 20px; background-color: #f0f2f5; border-radius: 8px; border: 1px solid var(--border-color); }
+        .feedback-log-container h4 { text-align: center; color: var(--primary-dark); margin-bottom: 15px; border-bottom: 1px solid var(--primary-color); padding-bottom: 5px; }
+        .feedback-log-list { list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto; }
+        .feedback-log-item { background-color: var(--bg-white); border: 1px solid var(--border-color); border-radius: 5px; padding: 12px 15px; margin-bottom: 12px; display: grid; grid-template-columns: auto 1fr; gap: 10px 15px; align-items: center; }
+        .feedback-log-item .q-number { font-weight: bold; color: var(--primary-color); font-size: 1.1em; grid-row: span 3; }
+        .feedback-log-item .q-text { font-weight: 600; grid-column: 2; display: flex; align-items: center; flex-wrap: wrap; gap: 5px;}
+        .feedback-log-item .q-user-answer { grid-column: 2; display: flex; align-items: center; gap: 8px; }
+        .feedback-log-item .q-user-answer .label { font-size: 0.9em; color: #555; }
+        .feedback-log-item .q-feedback { grid-column: 2; display: flex; align-items: center; gap: 8px; font-weight: 600; flex-wrap: wrap; }
+        .feedback-log-item .q-feedback .icon { font-size: 1.2em; }
+        .feedback-log-item .q-feedback.correct { color: var(--accent-dark); }
+        .feedback-log-item .q-feedback.incorrect { color: var(--error-color); }
+        .feedback-log-item .q-feedback.partial { color: #856404; }
+        .feedback-log-item .q-feedback .correction { margin-left: 5px; font-style: italic; font-weight: normal; color: #555; display: inline-flex; align-items: center; gap: 3px;}
+        .feedback-log-item .q-feedback.partial .correction { margin-left: 5px; font-style: italic; font-weight: normal; color: #555; display: inline-flex; align-items: center; gap: 3px;}
+
+         #diplome { background: linear-gradient(to bottom right, #eef7ff, #ffffff); }
+        #diplome-content { border: 15px solid transparent; border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1 stretch; padding: 45px 50px; background: #ffffff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%23f0f8ff" d="M50 0 L100 50 L50 100 L0 50 Z" opacity="0.05"/></svg>'); text-align: center; position: relative; font-family: 'Georgia', serif; border-radius: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        #diplome-content::before { content: '\1F393'; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: 4em; color: var(--primary-color); text-shadow: 2px 2px 4px rgba(0,0,0,0.2); } /* □ */
+        #diplome-content h2 { color: var(--primary-dark); font-size: 2.8em; margin-bottom: 25px; margin-top: 20px; text-transform: uppercase; letter-spacing: 3px; font-family: 'Roboto Slab', serif; }
+        #diplome-content p { font-size: 1.3em; margin-bottom: 20px; color: var(--text-color); }
+        #diplome-signature { margin-top: 60px; font-style: italic; color: #666; font-size: 1.1em; }
+        #diplome-nom { font-weight: bold; font-size: 1.8em; color: var(--accent-dark); display: inline-block; border-bottom: 2px solid var(--secondary-color); padding-bottom: 5px; margin: 10px 0; }
+        #diplome-score { font-weight: bold; color: var(--accent-dark); font-size: 1.4em; }
+        #diplome-date { margin-top: 30px; font-size: 0.9em; color: #888; }
+        
+        /* Canvas pour les confettis */
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+        /* Styles pour le Classement (Leaderboard) */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-top: 20px;
+        }
+        .leaderboard-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            text-align: left;
+        }
+        .leaderboard-table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .leaderboard-table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+
+        .leaderboard-table td {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .leaderboard-table td:first-child { border-left: 1px solid var(--border-color); border-top-left-radius: 8px; border-bottom-left-radius: 8px; font-weight: bold; font-size: 1.2em; }
+        .leaderboard-table td:last-child { border-right: 1px solid var(--border-color); border-top-right-radius: 8px; border-bottom-right-radius: 8px; color: #777; font-size: 0.9em; }
+
+        .leaderboard-table tr:hover td {
+            background-color: #eef7ff;
+            transform: scale(1.01);
+            transition: transform 0.2s ease;
+        }
+        .rank-1 { color: #d4af37; } /* Or */
+        .rank-2 { color: #c0c0c0; } /* Argent */
+        .rank-3 { color: #cd7f32; } /* Bronze */
+        
+        .empty-leaderboard { text-align: center; color: #777; font-style: italic; margin-top: 30px; }
+
+        .hidden { display: none !important; }
+        button:disabled { background-color: #adb5bd; cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: none; }
+
+        #sound-control { position: fixed; top: 15px; right: 15px; background-color: rgba(255, 255, 255, 0.8); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.5em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; transition: background-color 0.3s ease; }
+        #sound-control:hover { background-color: white; }
+
+         /* Responsive */
+         @media (max-width: 768px) {
+             .container { margin: 15px; padding: 15px; }
+             h1 { font-size: 2em; } h2 { font-size: 1.7em; } h3 { font-size: 1.4em; }
+             nav button { padding: 10px 15px; font-size: 0.9em;}
+             .interactive-area { gap: 10px;}
+             .fraction-input input { width: 45px; padding: 6px 4px; font-size: 0.9em;}
+             .fraction-line { width: 45px; }
+             .operation-symbol, .power-symbol span { font-size: 1.5em; margin: 0 10px;}
+              .power-display .power-base-paren { font-size: 1.8em; }
+              .power-display .fraction-group { font-size: 1em; }
+              .power-display sup { font-size: 1em; }
+              .question-area { font-size: 1.3em; padding: 10px 15px; gap: 5px;}
+
+             .visualization { gap: 15px; padding: 15px;}
+             .fraction-bar { width: 150px; height: 30px;}
+             .quiz-controls { flex-direction: column; gap: 15px;}
+             #exercice-operation-selection fieldset { gap: 10px;}
+             .answer-area { flex-direction: column; gap: 10px;}
+             .feedback-log-item { grid-template-columns: 1fr; gap: 5px 10px; }
+             .feedback-log-item .q-number { grid-row: auto; justify-self: start; margin-bottom: 5px;}
+             .feedback-log-item .q-text, .feedback-log-item .q-user-answer, .feedback-log-item .q-feedback { grid-column: 1 / -1; }
+             #diplome-content { padding: 25px 20px;}
+             #diplome-content h2 { font-size: 2em;}
+             #diplome-content p { font-size: 1.1em;}
+             #diplome-nom { font-size: 1.4em;}
+             #sound-control { width: 35px; height: 35px; font-size: 1.3em;}
+         }
+
+    </style>
+</head>
+<body>
+    <button id="sound-control" onclick="toggleSound()">&#x1F50A;</button> <!-- □ -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container">
+        <h1>&#x1F680; Les Fractions de zéro à héro &#x1F680;</h1>
+
+        <nav>
+            <button onclick="showSection('apprentissage')" id="nav-apprentissage" class="active">&#x1F4D6; Apprendre</button>
+            <button onclick="showSection('exercices')" id="nav-exercices">&#x270F; Exercices</button>
+            <button onclick="showSection('test')" id="nav-test">&#x1F3C6; Test Final</button>
+            <button onclick="showSection('classement')" id="nav-classement">&#x1F3C6; Classement</button>
+        </nav>
+
+        <!-- Section Apprentissage -->
+        <section id="apprentissage" class="active">
+            <h2>&#x1F4D6; Apprendre les Opérations</h2>
+
+            <div class="operation-module">
+                <h3>Addition (+) et Soustraction (-)</h3>
+                <p>Pour additionner ou soustraire, les fractions doivent avoir le <strong>même dénominateur</strong>. Trouve un dénominateur commun (le PPCM est idéal !), ajuste les numérateurs, puis additionne ou soustrais.</p>
+                <div class="interactive-area">
+                    <div class="fraction-input"> <input type="text" inputmode="decimal" pattern="[0-9-]*" id="addsub-num1" value="1" > <div class="fraction-line"></div> <input type="text" inputmode="decimal" pattern="[0-9-]*" id="addsub-den1" value="3"> </div>
+                    <select id="addsub-op" class="operation-symbol"> <option value="+">+</option> <option value="-">-</option> </select>
+                    <div class="fraction-input"> <input type="text" inputmode="decimal" pattern="[0-9-]*" id="addsub-num2" value="1"> <div class="fraction-line"></div> <input type="text" inputmode="decimal" pattern="[0-9-]*" id="addsub-den2" value="6"> </div>
+                    <span class="operation-symbol">=</span>
+                    <div id="addsub-result" class="result-area">?</div>
+                </div>
+                 <div id="addsub-visu" class="visualization">Visualisation apparaîtra ici</div>
+                <button onclick="calculateAddSub()" class="calc-button">Calculer et Visualiser</button>
+            </div>
+            <hr>
+
+            <div class="operation-module">
+                <h3>Multiplication (&times;)</h3>
+                <p>Multiplie les <strong>numérateurs</strong> ensemble et les <strong>dénominateurs</strong> ensemble. La visualisation montre le modèle de l'aire : on prend une fraction <i>de</i> l'autre fraction.</p>
+                 <div class="interactive-area">
+                    <div class="fraction-input"><input type="text" inputmode="decimal" pattern="[0-9-]*" id="mul-num1" value="1"><div class="fraction-line"></div><input type="text" inputmode="decimal" pattern="[0-9-]*" id="mul-den1" value="3"></div>
+                    <span class="operation-symbol">&times;</span>
+                    <div class="fraction-input"><input type="text" inputmode="decimal" pattern="[0-9-]*" id="mul-num2" value="1"><div class="fraction-line"></div><input type="text" inputmode="decimal" pattern="[0-9-]*" id="mul-den2" value="4"></div>
+                    <span class="operation-symbol">=</span><div id="mul-result" class="result-area">?</div>
+                </div>
+                 <div id="mul-visu" class="visualization" style="flex-direction: column;">
+                      <p style="font-weight: 600;">Visualisation (Modèle de l'Aire)</p>
+                      <div id="area-model-container" class="area-model-visu"></div>
+                      <p class="visu-explanation" id="mul-visu-explanation"></p>
+                  </div>
+                <button onclick="calculateMul()" class="calc-button">Calculer et Visualiser</button>
+            </div>
+            <hr>
+
+            <div class="operation-module">
+                <h3>Division (&divide;)</h3>
+                <p>Diviser par une fraction, c'est multiplier par son <strong>inverse</strong>. Inverse la deuxième fraction (numérateur &larr;&rarr; dénominateur) puis multiplie. Tu peux simplifier avant de multiplier !</p>
+                 <div class="interactive-area">
+                    <div class="fraction-input"><input type="text" inputmode="decimal" pattern="[0-9-]*" id="div-num1" value="3"><div class="fraction-line"></div><input type="text" inputmode="decimal" pattern="[0-9-]*" id="div-den1" value="4"></div>
+                    <span class="operation-symbol">&divide;</span>
+                    <div class="fraction-input"><input type="text" inputmode="decimal" pattern="[0-9-]*" id="div-num2" value="9"><div class="fraction-line"></div><input type="text" inputmode="decimal" pattern="[0-9-]*" id="div-den2" value="2"></div>
+                     <span class="operation-symbol">=</span><div id="div-result" class="result-area">?</div>
+                </div>
+                <div id="div-steps" class="division-steps">Les étapes apparaîtront ici...</div>
+                <button onclick="calculateDiv()" class="calc-button">Calculer et Détailler</button>
+            </div>
+            <hr>
+
+            <div class="operation-module">
+               <h3>Puissance (x<sup>n</sup>)</h3>
+               <p>Élève le <strong>numérateur</strong> ET le <strong>dénominateur</strong> à la puissance indiquée. Attention au signe si la base est négative !</p>
+                <div class="interactive-area power-symbol">
+                   <span>(</span>
+                   <div class="fraction-input"><input type="text" inputmode="decimal" pattern="[0-9-]*" id="pow-num" value="-2"><div class="fraction-line"></div><input type="text" inputmode="decimal" pattern="[0-9-]*" id="pow-den" value="3"></div>
+                    <span>)</span>
+                    <sup><input type="text" inputmode="decimal" pattern="[0-9-]*" id="pow-exp" value="3"></sup>
+                    <span class="operation-symbol">=</span><div id="pow-result" class="result-area">?</div>
+                </div>
+                 <div style="text-align: center; margin-top: 15px; padding: 10px; background-color: #f0f8ff; border-radius: 5px;">
+                     <p id="pow-sign-explanation" style="color: var(--primary-dark); font-weight: 600; font-style: italic; min-height: 1.2em;"></p>
+                 </div>
+                <button onclick="calculatePow()" class="calc-button">Calculer</button>
+            </div>
+       </section>
+
+        <!-- Section Exercices -->
+        <section id="exercices">
+            <h2>&#x270F; Entraînement Intensif !</h2>
+            <div class="quiz-container">
+                 <div id="exercice-intro">
+                    <div id="exercice-operation-selection">
+                         <legend>Choisis les opérations à pratiquer :</legend>
+                         <fieldset>
+                             <label><input type="checkbox" name="exercice-op" value="+" checked> + </label>
+                             <label><input type="checkbox" name="exercice-op" value="-" checked> - </label>
+                             <label><input type="checkbox" name="exercice-op" value="×" checked> &times; </label>
+                             <label><input type="checkbox" name="exercice-op" value="÷" checked> &divide; </label>
+                             <label><input type="checkbox" name="exercice-op" value="^" checked> x<sup>n</sup> </label>
+                         </fieldset>
+                    </div>
+                     <div class="quiz-controls">
+                         <button id="start-exercice-btn" onclick="startExercice()" class="calc-button" style="margin: 0;">&#x1F3AF; Commencer !</button>
+                         <label class="advanced-switch">
+                             <input type="checkbox" id="exercice-advanced-mode">
+                             <span>Mode Avancé (Négatifs)</span>
+                         </label>
+                     </div>
+                 </div>
+
+                <div id="exercice-area" class="hidden">
+                    <div id="exercice-timer" class="timer">Temps restant : --:--</div>
+                    <div id="exercice-progress">Question X / 10</div>
+                    <div id="exercice-question" class="question-area"></div>
+                    <div class="answer-area">
+                        <div class="fraction-input">
+                            <input type="text" inputmode="decimal" pattern="[0-9-]*" id="exercice-answer-num" > <div class="fraction-line"></div>
+                            <input type="text" inputmode="decimal" pattern="[0-9-]*" id="exercice-answer-den">
+                        </div>
+                        <button id="exercice-submit-btn" onclick="checkExerciceAnswer()">Valider &#x2705;</button>
+                    </div>
+                     <div id="exercice-feedback" class="feedback"></div>
+                     <div id="exercice-score" class="score">
+                         <span>Score : 0 / 10</span>
+                         <span class="streak-container hidden" id="exercice-streak"><span class="streak-icon">&#x1F525;</span> Série: <span id="exercice-streak-count">0</span></span>
+                     </div>
+                </div>
+
+                <div id="exercice-results" class="hidden">
+                    <h3>&#x1F4CA; Résultats de l'Entraînement</h3>
+                    <p>Ton score final est de <strong id="exercice-final-score" style="font-size: 1.2em;">X</strong> / 10.</p>
+                    <p id="exercice-result-message" style="font-weight: 600;"></p>
+                     <div id="exercice-feedback-log" class="feedback-log-container">
+                          <h4>&#x1F4DD; Récapitulatif des questions :</h4>
+                          <ul id="exercice-log-list" class="feedback-log-list"></ul>
+                     </div>
+                    <button onclick="resetExercice()" class="calc-button" style="background-color: var(--secondary-color); color: #333; margin-top: 20px;">Encore ! &#x1F501;</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Test -->
+        <section id="test">
+             <h2>&#x1F3C6; Test Final : Prouve ta Maîtrise !</h2>
+             <div class="quiz-container">
+                 <div id="test-intro">
+                     <div style="margin-bottom: 15px;">
+                        <label for="user-name" style="font-weight: 600; margin-right: 10px;">Entre ton nom de Champion :</label>
+                        <input type="text" id="user-name" placeholder="Prénom Nom" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; min-width: 200px;">
+                     </div>
+                      <div class="quiz-controls">
+                         <button id="start-test-btn" onclick="startTest()" class="calc-button" style="margin:0;">&#x1F3B6; Lancer le Test !</button>
+                          <label class="advanced-switch">
+                             <input type="checkbox" id="test-advanced-mode">
+                             <span>Mode Avancé (Négatifs)</span>
+                         </label>
+                     </div>
+                 </div>
+
+                <div id="test-area" class="hidden">
+                    <h3 id="test-welcome-message" style="color: var(--primary-color);">Bonne chance, ... !</h3>
+                    <div id="test-timer" class="timer">Temps restant : --:--</div>
+                    <div id="test-progress">Question X / 20</div>
+                    <div id="test-question" class="question-area"></div>
+                    <div class="answer-area">
+                        <div class="fraction-input">
+                            <input type="text" inputmode="decimal" pattern="[0-9-]*" id="test-answer-num" > <div class="fraction-line"></div>
+                            <input type="text" inputmode="decimal" pattern="[0-9-]*" id="test-answer-den">
+                        </div>
+                        <button id="test-submit-btn" onclick="checkTestAnswer()">Valider &#x2705;</button>
+                    </div>
+                     <div id="test-feedback" class="feedback"></div>
+                     <div id="test-score" class="score">
+                         <span>Score : 0 / 20</span>
+                         <span class="streak-container hidden" id="test-streak"><span class="streak-icon">&#x1F525;</span> Série: <span id="test-streak-count">0</span></span>
+                     </div>
+                 </div>
+
+                <div id="test-results" class="hidden">
+                    <h3>&#x1F3C1; Résultats du Test Final</h3>
+                    <p><strong id="test-final-user-name" style="font-size: 1.1em;">Utilisateur</strong>, ton score final est de <strong id="test-final-score" style="font-size: 1.3em;">X</strong> / 20.</p>
+                    <p id="test-result-message" style="font-weight: 600;"></p>
+                     <div id="test-feedback-log" class="feedback-log-container">
+                          <h4>&#x1F4DD; Récapitulatif de tes réponses :</h4>
+                          <ul id="test-log-list" class="feedback-log-list"></ul>
+                     </div>
+                    <button id="view-diploma-btn" onclick="showDiplomaSection()" class="calc-button hidden" style="background-color: var(--secondary-color); color: #333; margin-top: 20px;">&#x1F4DC; Voir le Diplôme !</button>
+                    <button onclick="resetTest()" class="calc-button" style="background-color: var(--primary-color); margin-top: 10px;">Refaire le test &#x1F501;</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Classement -->
+        <section id="classement">
+            <h2>&#x1F3C6; Tableau des Champions</h2>
+            <div id="leaderboard-list"></div>
+            <br>
+            <div style="text-align: center;">
+                <button onclick="clearLeaderboard()" style="background-color: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 0.9em; margin-top: 20px;">&#x1F5D1; Effacer le classement</button>
+            </div>
+        </section>
+
+         <!-- Section Diplôme -->
+         <section id="diplome">
+             <div id="diplome-content">
+                 <h2>&#x1F4DC; Diplôme d'Expert en Fractions &#x1F393;</h2>
+                <p>Ce diplôme est fièrement décerné à</p>
+                <p><span id="diplome-nom">[Nom de l'Apprenant]</span></p>
+                <p>pour avoir brillamment réussi le test final sur les opérations de fractions avec un score remarquable de</p>
+                <p><strong id="diplome-score">[Score ici]</strong>.</p>
+                <p>Ta maîtrise des additions, soustractions, multiplications, divisions et puissances de fractions est exemplaire&nbsp;! &#x2728;</p>
+                <p id="diplome-date">Décerné le [Date]</p>
+                <p id="diplome-signature">~ Les Fractions de zéro à héro ~</p>
+             </div>
+             <br>
+             <div style="text-align:center;">
+                  <button onclick="showSection('test')" class="calc-button" style="background-color: var(--primary-color);">Retour aux Résultats du Test</button>
+             </div>
+         </section>
+
+    </div><footer style="text-align: center; padding: 15px; margin-top: 20px; font-size: 0.9em; color: #777; border-top: 1px solid var(--border-color);">
+        Les Fractions de zéro à héro - ES2025
+    </footer>
+
+
+    <script>
+        // --- Audio Context for Sounds (inchangé) ---
+        let audioCtx;
+        let soundEnabled = true;
+
+        function initAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { console.warn("Web Audio API is not supported in this browser."); soundEnabled = false; updateSoundButton(); } } }
+        function playSound(type) { if (!soundEnabled || !audioCtx) return; const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); gain.gain.setValueAtTime(0.1, audioCtx.currentTime); if (type === 'correct') { osc.type = 'sine'; osc.frequency.setValueAtTime(660, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3); osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.3); } else if (type === 'incorrect') { osc.type = 'square'; osc.frequency.setValueAtTime(110, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4); osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.4); } else if (type === 'click') { osc.type = 'triangle'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1); osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1); } else if (type === 'partial') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2); osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.2); } }
+        function toggleSound() { if (!audioCtx) initAudio(); soundEnabled = !soundEnabled; updateSoundButton(); if (soundEnabled) playSound('click'); }
+        function updateSoundButton() { const btn = document.getElementById('sound-control'); if (soundEnabled) { btn.innerHTML = '&#x1F507;'; btn.title = "Couper le son"; } else { btn.innerHTML = '&#x1F50A;'; btn.title = "Activer le son"; } } /* □ / □ */
+
+        // --- Fonctions Utilitaires pour les Fractions (inchangées) ---
+        function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); if (b === 0) return a; return gcd(b, a % b); }
+        function simplifyFraction(num, den) { if (den === 0) { console.error("Dénominateur zéro."); return { num: NaN, den: NaN }; } if (num === 0) return { num: 0, den: 1 }; const common = gcd(num, den); let sNum = num / common; let sDen = den / common; if (sDen < 0) { sNum = -sNum; sDen = -sDen; } return { num: sNum, den: sDen }; }
+
+        // Helper displayFractionHTML
+        function displayFractionHTML(f, isStandaloneInText = false) {
+             if (typeof f === 'number' && !isNaN(f)) { return `${f}`; }
+             if (typeof f !== 'object' || f === null || typeof f.num !== 'number' || typeof f.den !== 'number' || isNaN(f.num) || isNaN(f.den)) { return `<span style="color:var(--error-color);">?</span>`; }
+
+             const sf = simplifyFraction(f.num, f.den);
+             const isNegative = sf.num < 0;
+             const absNum = Math.abs(sf.num);
+
+             if (sf.den === 1) return `${sf.num}`;
+             if (sf.num === 0) return `0`;
+
+             const negSignHTML = isNegative ? '<span class="negative-sign">−</span>' : '';
+             const fractionClass = `fraction-display ${isStandaloneInText ? 'standalone' : ''}`;
+
+             return `
+                 <div class="fraction-group">
+                     ${negSignHTML}
+                     <div class="${fractionClass}">
+                         <span class="num">${absNum}</span>
+                         <span class="fraction-line"></span>
+                         <span class="den">${sf.den}</span>
+                     </div>
+                 </div>`;
+         }
+
+        function getFractionFromInput(numId, denId) { 
+            const numVal = document.getElementById(numId).value.trim();
+            const denVal = document.getElementById(denId).value.trim();
+            const num = parseInt(numVal); 
+            const den = parseInt(denVal); 
+            
+            if (isNaN(num) || isNaN(den)) { alert("Entiers requis."); return {num: NaN, den: NaN, error: true}; } 
+            if (den === 0) { alert("Dénominateur 0 interdit !"); document.getElementById(denId).value = 1; return {num: num, den: 1, error: true}; } 
+            return { num, den, error: false }; 
+        }
+        
+        function displayFraction(resultElementId, fraction) { const el = document.getElementById(resultElementId); if (!el) return; if (isNaN(fraction.num) || isNaN(fraction.den)) { el.innerHTML = `<span style="color:var(--error-color); font-style:italic;">Erreur</span>`; return; } const sf = simplifyFraction(fraction.num, fraction.den); if (sf.den === 1 || sf.num === 0) { el.innerHTML = `${sf.num}`; } else { el.innerHTML = displayFractionHTML(sf, true); } }
+
+        // --- Visualisation V2 (inchangée) ---
+        function createFractionVisu(num, den, label = '', colorClass = 'numerator-part', isNegative = false) { const absNum = Math.abs(num), absDen = Math.abs(den); if (absDen <= 0) return '<div style="color:red;">Dénominateur invalide</div>'; const vg = document.createElement('div'); vg.className = 'fraction-visu-group'; const ld = document.createElement('div'); ld.className = 'fraction-label'; if (isNegative) { const ss = document.createElement('span'); ss.className = 'visu-neg-sign'; ss.innerText = '−'; ld.appendChild(ss); } ld.appendChild(document.createTextNode(label || `${absNum}/${absDen}`)); vg.appendChild(ld); const bc = document.createElement('div'); bc.className = 'fraction-visu-bars'; vg.appendChild(bc); const wu = Math.floor(absNum / absDen), rn = absNum % absDen; const actualCC = isNegative ? 'numerator-part-neg' : colorClass; for (let i = 0; i < wu; i++) { bc.appendChild(createSingleFractionBar(absDen, absDen, actualCC)); } if (rn > 0 || (absNum === 0 && wu === 0)) { bc.appendChild(createSingleFractionBar(rn, absDen, actualCC)); } return vg; }
+        function createSingleFractionBar(num, den, color) { const bc = document.createElement('div'); bc.className = 'fraction-bar-container'; const bar = document.createElement('div'); bar.className = 'fraction-bar'; const pw = den === 0 ? 0 : 100 / den; for (let i = 0; i < den; i++) { const p = document.createElement('div'); p.style.width = `${pw}%`; p.classList.add(i < num ? color : 'denominator-part'); bar.appendChild(p); } bc.appendChild(bar); return bc; }
+        function renderVisualization(visuId, elements, explanation = '') { const va = document.getElementById(visuId); va.innerHTML = ''; const ed = document.createElement('p'); ed.className = 'visu-explanation'; va.appendChild(ed); if (elements && elements.length > 0) { elements.forEach(el => { if (el instanceof Node) va.appendChild(el); }); ed.innerText = explanation; } else { va.appendChild(document.createTextNode('Visualisation non disponible.')); } }
+
+        // --- Logique des Opérations (Section Apprendre) ---
+        function calculateAddSub() { const f1_i = getFractionFromInput('addsub-num1', 'addsub-den1'), f2_i = getFractionFromInput('addsub-num2', 'addsub-den2'); if (f1_i.error || f2_i.error) return; const f1 = simplifyFraction(f1_i.num, f1_i.den), f2 = simplifyFraction(f2_i.num, f2_i.den); const op = document.getElementById('addsub-op').value; const lcm = (f1.den * f2.den) / gcd(f1.den, f2.den); const n1a = f1.num * (lcm / f1.den), n2a = f2.num * (lcm / f2.den); const resN = op === '+' ? n1a + n2a : n1a - n2a; const resF = simplifyFraction(resN, lcm); displayFraction('addsub-result', resF); const visE = []; const f1L = `${f1_i.num}/${f1_i.den}`, f2L = `${f2_i.num}/${f2_i.den}`; visE.push(createFractionVisu(f1.num, f1.den, f1L, 'numerator-part', f1.num < 0)); const opS = document.createElement('span'); opS.className='operation-symbol'; opS.innerText = op; visE.push(opS); visE.push(createFractionVisu(f2.num, f2.den, f2L, 'numerator-part-b', f2.num < 0)); const eqS = document.createElement('span'); eqS.className='operation-symbol'; eqS.innerText = '='; visE.push(eqS); visE.push(createFractionVisu(resF.num, resF.den, `Résultat`, 'numerator-part', resF.num < 0)); renderVisualization('addsub-visu', visE, `Dénominateur commun (PPCM) : ${lcm}`); }
+        function calculateMul() { const f1_i = getFractionFromInput('mul-num1', 'mul-den1'), f2_i = getFractionFromInput('mul-num2', 'mul-den2'); if (f1_i.error || f2_i.error) return; const f1 = simplifyFraction(f1_i.num, f1_i.den), f2 = simplifyFraction(f2_i.num, f2_i.den); if(f1.num < 0 || f2.num < 0) {} const resN = f1.num * f2.num, resD = f1.den * f2.den; const resF = simplifyFraction(resN, resD); displayFraction('mul-result', resF); const cont = document.getElementById('area-model-container'); cont.innerHTML = ''; const svgNS = "http://www.w3.org/2000/svg", svg = document.createElementNS(svgNS, "svg"); svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%'); svg.setAttribute('viewBox', '0 0 100 100'); const d1 = Math.abs(f1.den), d2 = Math.abs(f2.den), n1 = Math.abs(f1.num), n2 = Math.abs(f2.num); const cw = d1 === 0 ? 0 : 100 / d1, rh = d2 === 0 ? 0 : 100 / d2; const r1 = document.createElementNS(svgNS, "rect"); r1.setAttribute('x', '0'); r1.setAttribute('y', '0'); r1.setAttribute('width', cw * n1); r1.setAttribute('height', '100'); r1.setAttribute('fill', 'rgba(76, 175, 80, 0.4)'); svg.appendChild(r1); const r2 = document.createElementNS(svgNS, "rect"); r2.setAttribute('x', '0'); r2.setAttribute('y', '0'); r2.setAttribute('width', '100'); r2.setAttribute('height', rh * n2); r2.setAttribute('fill', 'rgba(33, 150, 243, 0.4)'); svg.appendChild(r2); const ov = document.createElementNS(svgNS, "rect"); ov.setAttribute('x', '0'); ov.setAttribute('y', '0'); ov.setAttribute('width', cw * n1); ov.setAttribute('height', rh * n2); ov.setAttribute('fill', 'rgba(0, 86, 179, 0.6)'); svg.appendChild(ov); for (let i = 1; i < d1; i++) { const l = document.createElementNS(svgNS, "line"); l.setAttribute('x1', cw * i); l.setAttribute('y1', '0'); l.setAttribute('x2', cw * i); l.setAttribute('y2', '100'); l.setAttribute('stroke', '#aaa'); l.setAttribute('stroke-width', '0.5'); svg.appendChild(l); } for (let i = 1; i < d2; i++) { const l = document.createElementNS(svgNS, "line"); l.setAttribute('x1', '0'); l.setAttribute('y1', rh * i); l.setAttribute('x2', '100'); l.setAttribute('y2', rh * i); l.setAttribute('stroke', '#aaa'); l.setAttribute('stroke-width', '0.5'); svg.appendChild(l); } cont.appendChild(svg); document.getElementById('mul-visu-explanation').innerText = `Carré divisé en ${d1} colonnes (vert: ${n1}) et ${d2} lignes (bleu: ${n2}). Superposition (foncée): ${n1}×${n2}=${Math.abs(resN)}/${d1}×${d2}=${Math.abs(resD)} parts. Résultat: ${resN}/${resD} (simplifié: ${resF.num}/${resF.den}).`; }
+        function calculateDiv() { const f1_i = getFractionFromInput('div-num1', 'div-den1'), f2_i = getFractionFromInput('div-num2', 'div-den2'); if (f1_i.error || f2_i.error) return; let f1 = { num: f1_i.num, den: f1_i.den }, f2 = { num: f2_i.num, den: f2_i.den }; if (f2.num === 0) { alert("Division par zéro !"); displayFraction('div-result', {num: NaN, den: NaN}); document.getElementById('div-steps').innerHTML = '<p style="color:red;">Erreur: Division par zéro.</p>'; return; } const resN = f1.num * f2.den, resD = f1.den * f2.num; const finalR = simplifyFraction(resN, resD); displayFraction('div-result', finalR); const stepsC = document.getElementById('div-steps'); stepsC.innerHTML = ''; stepsC.innerHTML += `<div class="step"><span class="step-label">Départ:</span><span class="fraction-step-display">${displayFractionHTML(f1,true)} <span class="div-step-op">&divide;</span> ${displayFractionHTML(f2,true)}</span></div>`; const f2_inv = { num: f2.den, den: f2.num }; stepsC.innerHTML += `<div class="step"><span class="step-label">Inverse:</span><span class="fraction-step-display">${displayFractionHTML(f1,true)} <span class="div-step-op">&times;</span> ${displayFractionHTML(f2_inv,true)}</span></div>`; let n1=f1.num, d1=f1.den, n2=f2_inv.num, d2=f2_inv.den; let simplified = false; let c1 = gcd(n1,d2); if(Math.abs(c1)>1){n1/=c1; d2/=c1; simplified=true;} let c2 = gcd(n2,d1); if(Math.abs(c2)>1){n2/=c2; d1/=c2; simplified=true;} if(simplified){ let f1_s={num:n1,den:d1}, f2_inv_s={num:n2,den:d2}; stepsC.innerHTML += `<div class="step"><span class="step-label">Simplifié:</span><span class="fraction-step-display">${displayFractionHTML(f1_s,true)} <span class="div-step-op">&times;</span> ${displayFractionHTML(f2_inv_s,true)}</span></div>`;} const iResN=n1*n2, iResD=d1*d2; stepsC.innerHTML += `<div class="step"><span class="step-label">Multiplié:</span><span class="fraction-step-display">${displayFractionHTML({num:iResN,den:iResD},true)}</span></div>`; if (iResN !== finalR.num || iResD !== finalR.den) { stepsC.innerHTML += `<div class="step"><span class="step-label">Final:</span><span class="fraction-step-display">${displayFractionHTML(finalR,true)}</span><span style="font-size:0.9em; color:#555;">(Simplifié)</span></div>`; } else if (!simplified && iResD !== 0) { stepsC.innerHTML += `<p style="font-size:0.9em; color:#555; margin-left: 70px;">(Non simplifiable)</p>` } }
+        function calculatePow() { const f_i = getFractionFromInput('pow-num', 'pow-den'); const expI = document.getElementById('pow-exp'); const exp = parseInt(expI.value); if(isNaN(exp)){alert("Exposant entier requis.");displayFraction('pow-result',{num:NaN,den:NaN});document.getElementById('pow-sign-explanation').innerText='';return;} if(exp<0){alert("Exposants négatifs non gérés ici.");expI.value=0;displayFraction('pow-result',{num:NaN,den:NaN});document.getElementById('pow-sign-explanation').innerText='';return;} if(f_i.error){document.getElementById('pow-sign-explanation').innerText='';return;} const f_b = simplifyFraction(f_i.num,f_i.den); const explEl = document.getElementById('pow-sign-explanation'); explEl.innerText=''; if(f_b.num===0&&exp===0){displayFraction('pow-result',{num:NaN,den:NaN});explEl.innerText="0^0 est indéterminé.";return;} if(f_b.num===0&&exp>0){displayFraction('pow-result',{num:0,den:1});explEl.innerText="0^n = 0 (n>0)";return;} if(exp===0){displayFraction('pow-result',{num:1,den:1});explEl.innerText="x^0 = 1 (x≠0)";return;} const resN=Math.pow(f_b.num,exp), resD=Math.pow(f_b.den,exp); if(!isFinite(resN)||!isFinite(resD)){displayFraction('pow-result',{num:NaN,den:NaN});explEl.innerText="Résultat trop grand.";return;} const resF=simplifyFraction(resN,resD); displayFraction('pow-result',resF); if(f_b.num<0){explEl.innerText=(exp%2===0)?"Base nég., exp. pair : Résultat positif.":"Base nég., exp. impair : Résultat négatif.";} }
+
+        // --- Gestion de la Navigation (inchangé) ---
+        const sections = document.querySelectorAll('section');
+        const navButtons = document.querySelectorAll('nav button');
+        function showSection(sectionId) { if (!audioCtx) initAudio(); if (currentQuizType === 'exercice' && exerciceState.timerInterval && sectionId !== 'exercices') { stopTimer(exerciceState.timerInterval); exerciceState.timerInterval = null; } if (currentQuizType === 'test' && testState.timerInterval && sectionId !== 'test' && sectionId !== 'diplome') { stopTimer(testState.timerInterval); testState.timerInterval = null; } let targetSection = document.getElementById(sectionId); navButtons.forEach(b => { b.classList.remove('active'); if ((sectionId === 'test' || sectionId === 'diplome') && b.id === 'nav-test') { b.classList.add('active'); } else if (b.id === `nav-${sectionId}`) { b.classList.add('active'); } }); sections.forEach(s => s.classList.remove('active')); if(targetSection) { targetSection.classList.add('active'); } if (sectionId === 'classement') { renderLeaderboard(); } resetQuizVisualStateIfNeeded(sectionId); }
+        function showDiplomaSection() { sections.forEach(s => s.classList.remove('active')); document.getElementById('diplome').classList.add('active'); playSound('correct'); startConfetti(); }
+        function resetQuizVisualStateIfNeeded(sectionId) { stopConfetti(); if (sectionId === 'exercices' && exerciceState.isFinished) { document.getElementById('exercice-results').classList.add('hidden'); document.getElementById('exercice-area').classList.add('hidden'); document.getElementById('exercice-intro').classList.remove('hidden'); } if (sectionId === 'test' && testState.isFinished) { document.getElementById('test-intro').classList.add('hidden'); document.getElementById('test-area').classList.add('hidden'); document.getElementById('test-results').classList.remove('hidden'); document.getElementById('diplome').classList.remove('active'); } else if (sectionId === 'test' && !testState.isFinished) { document.getElementById('test-results').classList.add('hidden'); document.getElementById('test-area').classList.add('hidden'); document.getElementById('test-intro').classList.remove('hidden'); document.getElementById('diplome').classList.remove('active'); } }
+
+        // --- Logique Exercices & Test V2 ---
+        const EXERCICE_QUESTIONS = 10; const EXERCICE_TIME_LIMIT = 300; const TEST_QUESTIONS = 20; const TEST_TIME_LIMIT = 600; const DIPLOMA_THRESHOLD = 15;
+        let exerciceState = { currentQuestionIndex: 0, score: 0, timeLeft: 0, timerInterval: null, currentProblem: null, isFinished: false, isAdvanced: false, selectedOps: [], history: [], streak: 0 };
+        let testState = { userName: "", currentQuestionIndex: 0, score: 0, timeLeft: 0, timerInterval: null, currentProblem: null, isFinished: false, isAdvanced: false, history: [], streak: 0 };
+        let currentQuizType = null;
+
+        function generateRandomFraction(allowNeg = false, maxD = 12, maxN = 15) { let n, d; do { d = Math.floor(Math.random() * (maxD - 1)) + 2; n = Math.floor(Math.random() * (maxN)) + 1; } while (Math.abs(n) === d || d === 0); if (allowNeg && Math.random() < 0.4) n = -n; return { num: n, den: d }; }
+
+        // MODIFIÉ : generateProblem (Ajustement probabilités exposants)
+        function generateProblem(isAdvancedMode, allowedOps = null) {
+            const defaultOps = ['+', '-', '×', '÷', '^'];
+            const ops = (allowedOps && allowedOps.length > 0) ? allowedOps : defaultOps;
+            let op, f1, f2, exp, problemText = '', correctAnswer = null;
+            let attempts = 0; const MAX_ATTEMPTS = 25;
+
+            do {
+                attempts++;
+                op = ops[Math.floor(Math.random() * ops.length)];
+                f1 = generateRandomFraction(isAdvancedMode); f1 = simplifyFraction(f1.num, f1.den);
+                correctAnswer = null; problemText = ''; exp = undefined;
+
+                if (op === '^') {
+                    // MODIFIÉ : Probabilités ajustées pour 0 et 1 (5% chacun), 2 (55%) et 3 (35%)
+                    let randExp = Math.random();
+                    if (randExp < 0.05 && f1.num !== 0) {
+                        exp = 0; // 5% chance
+                    } else if (randExp < 0.10) {
+                        exp = 1; // 5% chance (0.10 - 0.05)
+                    } else if (randExp < 0.65) {
+                        exp = 2; // 55% chance
+                    } else {
+                        exp = 3; // 35% chance
+                    }
+                    
+                    if (f1.num === 0 && exp === 0) continue;
+
+                    if (f1.num === 0 && exp > 0) correctAnswer = { num: 0, den: 1 };
+                    else if (exp === 0) correctAnswer = { num: 1, den: 1 };
+                    else { const rN=Math.pow(f1.num,exp), rD=Math.pow(f1.den,exp); if(!isFinite(rN)||!isFinite(rD)) continue; correctAnswer = simplifyFraction(rN,rD); }
+                     problemText = `<span class="power-display"><span class="power-base-paren">(</span>${displayFractionHTML(f1)}<span class="power-base-paren">)</span><sup>${exp}</sup></span>`;
+
+                } else {
+                    f2 = generateRandomFraction(isAdvancedMode); f2 = simplifyFraction(f2.num, f2.den);
+                    if (op === '÷' && f2.num === 0) continue;
+
+                    switch (op) {
+                        case '+': const lcmAdd = (f1.den*f2.den)/gcd(f1.den,f2.den); correctAnswer=simplifyFraction(f1.num*(lcmAdd/f1.den)+f2.num*(lcmAdd/f2.den),lcmAdd); break;
+                        case '-': const lcmSub = (f1.den*f2.den)/gcd(f1.den,f2.den); correctAnswer=simplifyFraction(f1.num*(lcmSub/f1.den)-f2.num*(lcmSub/f2.den),lcmSub);
+                                    if (!isAdvancedMode && correctAnswer.num < 0) { correctAnswer = null; }
+                                    break;
+                        case '×': correctAnswer=simplifyFraction(f1.num*f2.num,f1.den*f2.den); op = '×'; break;
+                        case '÷': correctAnswer=simplifyFraction(f1.num*f2.den,f1.den*f2.num); op = '÷'; break;
+                    }
+                     if (correctAnswer) {
+                         let f2HTML = displayFractionHTML(f2, true);
+                         if (f2.num < 0) {
+                             f2HTML = `<span class="fraction-paren">(</span>${f2HTML}<span class="fraction-paren">)</span>`;
+                         }
+                         problemText = `${displayFractionHTML(f1, true)} <span class="operation-symbol">${op}</span> ${f2HTML}`;
+                     }
+                }
+            } while (!correctAnswer && attempts < MAX_ATTEMPTS);
+
+            if (!correctAnswer) {
+                console.warn("Fallback: Impossible de générer question valide, utilise addition.");
+                op='+'; f1=simplifyFraction(generateRandomFraction(isAdvancedMode).num, generateRandomFraction(isAdvancedMode).den); f2=simplifyFraction(generateRandomFraction(isAdvancedMode).num, generateRandomFraction(isAdvancedMode).den); const lcmAdd=(f1.den*f2.den)/gcd(f1.den,f2.den); correctAnswer=simplifyFraction(f1.num*(lcmAdd/f1.den)+f2.num*(lcmAdd/f2.den),lcmAdd); exp=undefined; 
+                let f2HTML = displayFractionHTML(f2, true);
+                if (f2.num < 0) {
+                        f2HTML = `<span class="fraction-paren">(</span>${f2HTML}<span class="fraction-paren">)</span>`;
+                }
+                problemText=`${displayFractionHTML(f1, true)} <span class="operation-symbol">${op}</span> ${f2HTML}`;
+            }
+            return { f1, f2, op, exp, problemText, correctAnswer };
+        }
+
+        // --- Logique Confettis ---
+        let confettiInterval = null;
+        function startConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const colors = ['#007bff', '#ffc107', '#28a745', '#dc3545', '#17a2b8'];
+            
+            for(let i=0; i<150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speed: Math.random() * 3 + 2,
+                    angle: Math.random() * 6.28,
+                    spin: Math.random() * 0.2 - 0.1
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    p.angle += p.spin;
+                    p.x += Math.sin(p.angle) * 0.5;
+                    
+                    if(p.y > canvas.height) {
+                        p.y = -10;
+                        p.x = Math.random() * canvas.width;
+                    }
+                    
+                    ctx.fillStyle = p.color;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.angle);
+                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                    ctx.restore();
+                });
+            }
+            
+            if(confettiInterval) clearInterval(confettiInterval);
+            confettiInterval = setInterval(draw, 20);
+        }
+        
+        function stopConfetti() {
+            if(confettiInterval) clearInterval(confettiInterval);
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // --- Logique Classement (Leaderboard) ---
+        const LEADERBOARD_KEY = 'fraction_hero_leaderboard_v1';
+
+        function saveHighScore(name, score) {
+            let scores = [];
+            try { 
+                // Tentative de lecture sécurisée (pour Weebly/iframes)
+                const stored = localStorage.getItem(LEADERBOARD_KEY);
+                if (stored) scores = JSON.parse(stored);
+            } catch(e) { console.warn("Impossible de lire le localStorage", e); }
+            
+            const today = new Date().toLocaleDateString('fr-FR');
+            scores.push({ name: name, score: score, date: today });
+            
+            // Tri : Score décroissant
+            scores.sort((a, b) => b.score - a.score);
+            
+            // Garder le top 5
+            scores = scores.slice(0, 5);
+            
+            try {
+                // Tentative d'écriture sécurisée
+                localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(scores));
+            } catch(e) { console.warn("Impossible d'écrire dans le localStorage (Weebly sandbox ?)", e); }
+        }
+
+        function renderLeaderboard() {
+            let scores = [];
+            try { 
+                const stored = localStorage.getItem(LEADERBOARD_KEY);
+                if (stored) scores = JSON.parse(stored);
+            } catch(e) { console.warn("Lecture localStorage échouée", e); }
+            
+            const container = document.getElementById('leaderboard-list');
+            if (scores.length === 0) {
+                container.innerHTML = '<div class="empty-leaderboard">Aucun champion pour le moment. Passe le Test Final pour entrer dans la légende !</div>';
+                return;
+            }
+            
+            let html = '<table class="leaderboard-table"><thead><tr><th>Rang</th><th>Nom</th><th>Score</th><th>Date</th></tr></thead><tbody>';
+            scores.forEach((s, index) => {
+                let rankDisplay = index + 1;
+                let rowClass = '';
+                if (index === 0) { rankDisplay = '🥇 1'; rowClass = 'rank-1'; }
+                else if (index === 1) { rankDisplay = '🥈 2'; rowClass = 'rank-2'; }
+                else if (index === 2) { rankDisplay = '🥉 3'; rowClass = 'rank-3'; }
+                
+                html += `<tr style="font-weight:${index < 3 ? 'bold' : 'normal'}">
+                    <td class="${rowClass}">${rankDisplay}</td>
+                    <td>${s.name}</td>
+                    <td><strong>${s.score} / 20</strong></td>
+                    <td>${s.date}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function clearLeaderboard() {
+            if(confirm("Es-tu sûr de vouloir effacer tout le classement ?")) {
+                try { localStorage.removeItem(LEADERBOARD_KEY); } catch(e) {}
+                renderLeaderboard();
+            }
+        }
+
+        // MODIFIÉ : displayQuizQuestion (simplifié car problemText est déjà formaté)
+        function displayQuizQuestion(quizType) {
+            const state = quizType === 'exercice' ? exerciceState : testState;
+            const problem = state.currentProblem;
+            const qArea = document.getElementById(`${quizType}-question`);
+            const progressEl = document.getElementById(`${quizType}-progress`);
+            const totalQ = quizType === 'exercice' ? EXERCICE_QUESTIONS : TEST_QUESTIONS;
+            const ansNum = document.getElementById(`${quizType}-answer-num`);
+            const ansDen = document.getElementById(`${quizType}-answer-den`);
+            const feedbackEl = document.getElementById(`${quizType}-feedback`);
+
+            qArea.innerHTML = problem.problemText + ` <span class="operation-symbol" style="margin-left: 10px;">= ?</span>`;
+            progressEl.innerText = `Question ${state.currentQuestionIndex + 1} / ${totalQ}`;
+            ansNum.value = ''; ansDen.value = '';
+            feedbackEl.innerHTML = ''; feedbackEl.className = 'feedback';
+            
+            // Mise à jour de l'affichage de la série
+            updateStreakDisplay(quizType, state.streak);
+            
+            ansNum.focus();
+        }
+        
+        function updateStreakDisplay(quizType, streak) {
+            const streakContainer = document.getElementById(`${quizType}-streak`);
+            const streakCount = document.getElementById(`${quizType}-streak-count`);
+            
+            if (streak > 1) {
+                streakContainer.classList.remove('hidden');
+                streakCount.innerText = streak;
+                // Petit effet visuel si streak élevé
+                if (streak >= 5) streakContainer.style.borderColor = '#ff4500';
+                else streakContainer.style.borderColor = '#ffeeba';
+            } else {
+                streakContainer.classList.add('hidden');
+            }
+        }
+
+        // MODIFIÉ : startExercice (réactive bouton submit)
+        function startExercice() {
+            currentQuizType = 'exercice';
+            const isAdvanced = document.getElementById('exercice-advanced-mode').checked;
+            const selOpsCB = document.querySelectorAll('#exercice-operation-selection input[name="exercice-op"]:checked');
+            const selOps = Array.from(selOpsCB).map(cb => cb.value);
+            if (selOps.length === 0) { alert("Sélectionnez au moins une opération !"); return; }
+
+            exerciceState = { currentQuestionIndex: 0, score: 0, timeLeft: EXERCICE_TIME_LIMIT, timerInterval: null, currentProblem: null, isFinished: false, isAdvanced: isAdvanced, selectedOps: selOps, history: [], streak: 0 };
+            document.getElementById('exercice-intro').classList.add('hidden');
+            document.getElementById('exercice-results').classList.add('hidden');
+            document.getElementById('exercice-area').classList.remove('hidden');
+            document.getElementById('exercice-score').querySelector('span:first-child').innerText = `Score : 0 / ${EXERCICE_QUESTIONS}`;
+            exerciceState.currentProblem = generateProblem(exerciceState.isAdvanced, exerciceState.selectedOps);
+            displayQuizQuestion('exercice');
+            exerciceState.timerInterval = startTimer(EXERCICE_TIME_LIMIT, 'exercice-timer', exerciceState, finishExercice);
+            document.getElementById('exercice-submit-btn').disabled = false;
+            playSound('click');
+        }
+
+        // MODIFIÉ : checkQuizAnswer (Gestion du streak)
+        function checkQuizAnswer(quizType) {
+            const state = quizType === 'exercice' ? exerciceState : testState;
+            const totalQ = quizType === 'exercice' ? EXERCICE_QUESTIONS : TEST_QUESTIONS;
+            const numIn = document.getElementById(`${quizType}-answer-num`);
+            const denIn = document.getElementById(`${quizType}-answer-den`);
+            const feedbackEl = document.getElementById(`${quizType}-feedback`);
+            const submitBtn = document.getElementById(`${quizType}-submit-btn`);
+
+            const numStr = numIn.value.trim(), denStr = denIn.value.trim();
+            if (numStr === '') { feedbackEl.innerText = "Numérateur requis !"; feedbackEl.className = 'feedback incorrect'; return; }
+            const userD = (denStr === '') ? 1 : parseInt(denStr); const userN = parseInt(numStr);
+            if (isNaN(userN) || isNaN(userD)) { feedbackEl.innerText = "Entrée numérique invalide."; feedbackEl.className = 'feedback incorrect'; return; }
+            if (userD === 0) { feedbackEl.innerText = "Dénominateur 0 interdit !"; feedbackEl.className = 'feedback incorrect'; denIn.value = ''; return; }
+
+            const userAnsRaw = { num: userN, den: userD };
+            const userAnsSimp = simplifyFraction(userN, userD);
+            const correctAns = state.currentProblem.correctAnswer;
+
+            submitBtn.disabled = true;
+            let scoreToAdd = 0; let feedbackMsg = ""; let feedbackClass = ""; let isCorrect = false; let needsSimp = false;
+
+            if (userAnsSimp.num === correctAns.num && userAnsSimp.den === correctAns.den) {
+                isCorrect = true;
+                const isRawSimp = (userAnsRaw.den===1||userAnsRaw.num===0||gcd(userAnsRaw.num,userAnsRaw.den)===1)||(userAnsRaw.num===userAnsSimp.num && userAnsRaw.den===userAnsSimp.den);
+                if (isRawSimp) { 
+                    scoreToAdd = 1; 
+                    feedbackMsg = "Bravo, c'est exact !"; 
+                    feedbackClass = 'feedback correct'; 
+                    state.streak++; // Augmenter la série
+                    playSound('correct'); 
+                } else { 
+                    scoreToAdd = 0.5; 
+                    needsSimp = true; 
+                    const simpDisp = displayFractionHTML(correctAns, true); 
+                    feedbackMsg = `Correct, mais simplifie ! ${simpDisp}. (+${scoreToAdd} pt)`; 
+                    feedbackClass = 'feedback partial'; 
+                    state.streak++; // Compte quand même pour la série
+                    playSound('partial'); 
+                }
+            } else { 
+                scoreToAdd = 0; 
+                let correctDisp = displayFractionHTML(correctAns, true); 
+                feedbackMsg = `Incorrect... La réponse était : ${correctDisp}`; 
+                feedbackClass = 'feedback incorrect'; 
+                state.streak = 0; // Briser la série
+                playSound('incorrect'); 
+            }
+
+            state.score += scoreToAdd;
+            feedbackEl.innerHTML = feedbackMsg;
+            feedbackEl.className = feedbackClass;
+            document.getElementById(`${quizType}-score`).querySelector('span:first-child').innerText = `Score : ${state.score.toLocaleString('fr-FR')} / ${totalQ}`;
+            updateStreakDisplay(quizType, state.streak);
+
+            const historyRec = { questionTextHTML: state.currentProblem.problemText, userAnswerRaw: userAnsRaw, userAnswerSimplified: userAnsSimp, correctAnswer: correctAns, isCorrect: isCorrect, needsSimplification: needsSimp, scoreAwarded: scoreToAdd };
+            state.history.push(historyRec);
+
+            setTimeout(() => {
+                state.currentQuestionIndex++;
+                if (state.currentQuestionIndex < totalQ) {
+                    const ops = quizType === 'exercice' ? state.selectedOps : null;
+                    state.currentProblem = generateProblem(state.isAdvanced, ops);
+                    displayQuizQuestion(quizType);
+                    submitBtn.disabled = false;
+                } else {
+                    if (quizType === 'exercice') finishExercice(); else finishTest();
+                }
+            }, 2000);
+        }
+        function checkExerciceAnswer() { checkQuizAnswer('exercice'); } function checkTestAnswer() { checkQuizAnswer('test'); }
+
+        // MODIFIÉ : displayFeedbackLog (utilise innerHTML pour questionTextHTML)
+        function displayFeedbackLog(listElementId, historyArray) {
+            const listEl = document.getElementById(listElementId); if (!listEl) return; listEl.innerHTML = '';
+            if (!historyArray || historyArray.length === 0) { listEl.innerHTML = '<li>Aucun historique.</li>'; return; }
+            historyArray.forEach((rec, index) => {
+                const li = document.createElement('li'); li.className = 'feedback-log-item';
+                let userDisp = displayFractionHTML(rec.userAnswerRaw, true); let feedbackHTML = ''; let feedbackClass = '';
+                if (rec.isCorrect) {
+                    if (rec.needsSimplification) { feedbackClass = 'partial'; feedbackHTML = `<span class="icon">\u26A0\ufe0f</span> Correct, mais non simplifié. <span class="correction">(Simplifié: ${displayFractionHTML(rec.correctAnswer, true)})</span>`; }
+                    else { feedbackClass = 'correct'; feedbackHTML = `<span class="icon">\u2705</span> Bravo !`; }
+                } else { feedbackClass = 'incorrect'; feedbackHTML = `<span class="icon">\u274C</span> Erreur. <span class="correction">La réponse était: ${displayFractionHTML(rec.correctAnswer, true)}</span>`; }
+
+                li.innerHTML = `
+                    <span class="q-number">${index + 1}.</span>
+                    <div class="q-text">${rec.questionTextHTML} <span class="operation-symbol" style="font-size: 1em;">= ?</span></div>
+                    <div class="q-user-answer"><span class="label">Ta réponse:</span> ${userDisp}</div>
+                    <div class="q-feedback ${feedbackClass}">${feedbackHTML}</div> `;
+                listEl.appendChild(li);
+            });
+        }
+
+        // MODIFIÉ : finishExercice (utilise toLocaleString et innerHTML pour emojis)
+        function finishExercice() { exerciceState.isFinished = true; if (exerciceState.timerInterval) stopTimer(exerciceState.timerInterval); exerciceState.timerInterval = null; document.getElementById('exercice-area').classList.add('hidden'); document.getElementById('exercice-results').classList.remove('hidden'); document.getElementById('exercice-final-score').innerText = exerciceState.score.toLocaleString('fr-FR'); let msg = ""; const scorePc = (exerciceState.score / EXERCICE_QUESTIONS) * 100; if (scorePc >= 80) msg = "&#x2B50; Excellent travail ! Tu es sur la bonne voie ! &#x2B50;"; else if (scorePc >= 50) msg = "&#x1F60E; Pas mal ! Continue à t'entraîner ! &#x1F4AA;"; else msg = "&#x1F440; Continue, chaque erreur est une leçon ! &#x1F440;"; document.getElementById('exercice-result-message').innerHTML = msg; displayFeedbackLog('exercice-log-list', exerciceState.history); currentQuizType = null; }
+        function resetExercice() { playSound('click'); exerciceState.isFinished = false; exerciceState.history = []; exerciceState.streak = 0; document.getElementById('exercice-results').classList.add('hidden'); document.getElementById('exercice-area').classList.add('hidden'); document.getElementById('exercice-intro').classList.remove('hidden'); document.querySelectorAll('#exercice-operation-selection input[name="exercice-op"]').forEach(cb => cb.checked = true); document.getElementById('exercice-advanced-mode').checked = false; document.getElementById('exercice-log-list').innerHTML = ''; }
+
+        // MODIFIÉ : startTest (réactive bouton submit)
+        function startTest() {
+            const nameIn = document.getElementById('user-name'); const name = nameIn.value.trim(); if (!name) { alert("N'oublie pas ton nom ! &#x1F609;"); return; }
+            currentQuizType = 'test';
+            const isAdv = document.getElementById('test-advanced-mode').checked;
+            testState = { userName: name, currentQuestionIndex: 0, score: 0, timeLeft: TEST_TIME_LIMIT, timerInterval: null, currentProblem: null, isFinished: false, isAdvanced: isAdv, history: [], streak: 0 };
+            document.getElementById('test-intro').classList.add('hidden'); document.getElementById('test-results').classList.add('hidden'); document.getElementById('diplome').classList.remove('active'); document.getElementById('test-area').classList.remove('hidden'); document.getElementById('test-welcome-message').innerText = `C'est parti, ${testState.userName} ! Montre ce que tu sais faire !`; document.getElementById('test-score').querySelector('span:first-child').innerText = `Score : 0 / ${TEST_QUESTIONS}`;
+            testState.currentProblem = generateProblem(testState.isAdvanced); displayQuizQuestion('test');
+            testState.timerInterval = startTimer(TEST_TIME_LIMIT, 'test-timer', testState, finishTest);
+            document.getElementById('test-submit-btn').disabled = false;
+            playSound('click');
+        }
+
+        // MODIFIÉ : finishTest (Sauvegarde Score avec Try/Catch)
+        function finishTest() { 
+            testState.isFinished = true; 
+            if (testState.timerInterval) stopTimer(testState.timerInterval); 
+            testState.timerInterval = null; 
+            
+            document.getElementById('test-area').classList.add('hidden'); 
+            document.getElementById('test-results').classList.remove('hidden'); 
+            document.getElementById('test-final-user-name').innerText = testState.userName; 
+            document.getElementById('test-final-score').innerText = testState.score.toLocaleString('fr-FR'); 
+            
+            // Sauvegarder le score pour le classement (protégé)
+            saveHighScore(testState.userName, testState.score);
+
+            let msg = ""; 
+            const viewDipBtn = document.getElementById('view-diploma-btn'); 
+            if (testState.score >= DIPLOMA_THRESHOLD) { 
+                msg = `&#x1F3C6; &#x1F3C5; FÉLICITATIONS ${testState.userName.toUpperCase()} ! &#x1F3C5; &#x1F3C6; Score: ${testState.score.toLocaleString('fr-FR')}/${TEST_QUESTIONS}. Expert ! Diplôme prêt !`; 
+                updateDiploma(); 
+                viewDipBtn.classList.remove('hidden'); 
+                playSound('correct'); 
+                playSound('correct'); 
+            } else { 
+                const scorePc = (testState.score / TEST_QUESTIONS) * 100; 
+                if (scorePc >= 50) msg = `&#x1F340; Bien joué, ${testState.userName} ! ${testState.score.toLocaleString('fr-FR')}/${TEST_QUESTIONS}. Belle progression ! &#x1F44D;`; 
+                else msg = `&#x1F9E0; Score: ${testState.score.toLocaleString('fr-FR')}/${TEST_QUESTIONS}. Revois les leçons et reviens plus fort ! □`; 
+                viewDipBtn.classList.add('hidden'); 
+                playSound('incorrect'); 
+            } 
+            document.getElementById('test-result-message').innerHTML = msg; 
+            displayFeedbackLog('test-log-list', testState.history); 
+            currentQuizType = null; 
+        }
+        function updateDiploma() { document.getElementById('diplome-nom').innerText = testState.userName; document.getElementById('diplome-score').innerText = `${testState.score.toLocaleString('fr-FR')}/${TEST_QUESTIONS}`; const today = new Date(); const opts = { year: 'numeric', month: 'long', day: 'numeric' }; document.getElementById('diplome-date').innerText = `Décerné le ${today.toLocaleDateString('fr-FR', opts)}`; }
+        function resetTest() { playSound('click'); testState.isFinished = false; testState.history = []; testState.streak = 0; document.getElementById('test-results').classList.add('hidden'); document.getElementById('diplome').classList.remove('active'); document.getElementById('test-area').classList.add('hidden'); document.getElementById('test-intro').classList.remove('hidden'); document.getElementById('view-diploma-btn').classList.add('hidden'); document.getElementById('test-log-list').innerHTML = ''; }
+
+        // --- Timer Générique V2 (inchangé) ---
+        function startTimer(duration, displayId, stateObj, onEnd) { if (stateObj.timerInterval) clearInterval(stateObj.timerInterval); stateObj.timeLeft = duration; updateTimerDisplay(displayId, stateObj.timeLeft); stateObj.timerInterval = setInterval(() => { stateObj.timeLeft--; updateTimerDisplay(displayId, stateObj.timeLeft); if (stateObj.timeLeft <= 0) { stopTimer(stateObj.timerInterval); stateObj.timerInterval = null; if (!stateObj.isFinished) { onEnd(); } } }, 1000); return stateObj.timerInterval; }
+        function stopTimer(intervalId) { clearInterval(intervalId); }
+        function updateTimerDisplay(elId, secs) { const disp = document.getElementById(elId); if (!disp) return; const mins = Math.floor(secs / 60); const remSecs = secs % 60; disp.innerHTML = `⌛️ ${mins}:${remSecs < 10 ? '0' : ''}${remSecs}`; if (secs <= 30 && secs > 10) { disp.style.color = '#ff8c00'; disp.style.borderColor = '#ff8c00'; } else if (secs <= 10) { disp.style.color = 'var(--error-color)'; disp.style.borderColor = 'var(--error-color)'; } else { disp.style.color = 'var(--error-color)'; disp.style.borderColor = 'var(--secondary-color)'; } }
+
+        // --- Initialisation ---
+        window.onload = () => { showSection('apprentissage'); updateSoundButton(); calculateAddSub(); calculateMul(); calculateDiv(); calculatePow(); ['addsub-num1','addsub-den1','addsub-op','addsub-num2','addsub-den2'].forEach(id=>document.getElementById(id)?.addEventListener('change',calculateAddSub)); ['mul-num1','mul-den1','mul-num2','mul-den2'].forEach(id=>document.getElementById(id)?.addEventListener('change',calculateMul)); ['div-num1','div-den1','div-num2','div-den2'].forEach(id=>document.getElementById(id)?.addEventListener('change',calculateDiv)); ['pow-num','pow-den','pow-exp'].forEach(id=>document.getElementById(id)?.addEventListener('change',calculatePow)); document.body.addEventListener('click', initAudio, { once: true }); resetQuizVisualStateIfNeeded('apprentissage'); document.getElementById('exercice-intro').classList.remove('hidden'); document.getElementById('test-intro').classList.remove('hidden'); };
+    </script>
+
+</body>
+</html>
