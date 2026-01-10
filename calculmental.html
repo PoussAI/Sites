@@ -165,6 +165,29 @@
             transform: none;
             box-shadow: none;
         }
+        
+        button.sign-button {
+            background-color: #78909c;
+            color: white;
+            border: none;
+            width: 50px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            margin-right: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        button.sign-button:hover {
+            background-color: #546e7a;
+        }
+        button.sign-button:active {
+            transform: translateY(2px);
+        }
 
         .grid-buttons {
             display: flex;
@@ -264,6 +287,7 @@
         .answer-wrapper {
             display: flex;
             justify-content: center;
+            align-items: stretch;
             gap: 10px;
             margin-bottom: 20px;
         }
@@ -318,6 +342,33 @@
             border-radius: 8px;
             padding: 15px;
         }
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .leaderboard-subtitle {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+            background: #f1f8e9;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .toggle-btn {
+            background: none;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+        .toggle-btn:hover { background: var(--primary-color); color: white; }
+
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
@@ -339,13 +390,16 @@
         .rank-3 { color: #CD7F32; font-weight: bold; font-size: 1.1em; }
         
         .mode-badge {
-            font-size: 0.8em;
-            padding: 3px 8px;
-            border-radius: 12px;
+            font-size: 0.75em;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-weight: 600;
+            display: inline-block;
+            margin: 1px;
         }
-        .mode-std { background-color: #e3f2fd; color: #1565c0; }
-        .mode-blitz { background-color: #ffebee; color: #c62828; }
+        .badge-mode { background-color: #e3f2fd; color: #1565c0; }
+        .badge-lvl { background-color: #fff3e0; color: #ef6c00; }
+        .badge-neg { background-color: #ffebee; color: #c62828; }
 
         /* --- Audio Button & Confetti --- */
         #sound-control { position: fixed; top: 15px; right: 15px; background-color: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-color); border-radius: 50%; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.5em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; transition: background-color 0.3s ease; }
@@ -382,7 +436,7 @@
             
             <div class="form-group">
                 <label for="userName" style="font-weight:600; display:block; margin-bottom:10px;">Ton prénom :</label>
-                <input type="text" id="userName" class="large-input" placeholder=" Ton prénom">
+                <input type="text" id="userName" class="large-input" placeholder="Prénom ici">
             </div>
 
             <div style="text-align: left; max-width: 450px; margin: 0 auto;">
@@ -464,7 +518,8 @@
             <div id="questionText" class="question-area">? + ?</div>
 
             <div class="answer-wrapper">
-                <input type="text" id="answerInput" class="large-input" placeholder="Réponse..." inputmode="numeric" pattern="[0-9-]*">
+                <button class="sign-button" onclick="toggleSign()" title="Changer de signe">+/-</button>
+                <input type="text" id="answerInput" class="large-input" placeholder="Réponse" inputmode="numeric" pattern="[0-9-]*">
                 <button id="checkButton" class="action-button" onclick="checkAnswer()">Valider</button>
             </div>
 
@@ -481,7 +536,11 @@
             </div>
             
             <div class="leaderboard-container">
-                <h4>&#x1F451; Tableau des Scores</h4>
+                <div class="leaderboard-header">
+                    <h4>&#x1F451; Tableau des Scores</h4>
+                    <button class="toggle-btn" onclick="toggleLeaderboardView()" id="leaderboardToggleBtn">Tout voir</button>
+                </div>
+                <div id="leaderboardSubtitle" class="leaderboard-subtitle"></div>
                 <div id="leaderboardList"></div>
             </div>
 
@@ -520,6 +579,9 @@
         
         const TOTAL_QUESTIONS_STD = 20;
         const BLITZ_DURATION = 60; // seconds
+
+        // Leaderboard State
+        let showAllScores = false;
 
         /* --- AUDIO & UTILS --- */
         let audioCtx;
@@ -650,6 +712,20 @@
         function toggleCheckbox(id) {
             const cb = document.getElementById(id);
             cb.checked = !cb.checked;
+        }
+        
+        function toggleSign() {
+            const input = document.getElementById('answerInput');
+            let val = input.value.trim();
+            // Don't toggle if empty, unless we want to start with a minus
+            if (val === '') {
+                input.value = '-';
+            } else if (val.startsWith('-')) {
+                input.value = val.substring(1);
+            } else {
+                input.value = '-' + val;
+            }
+            input.focus();
         }
 
         /* --- QUIZ LOGIC --- */
@@ -931,9 +1007,9 @@
         });
 
         /* --- LEADERBOARD LOGIC --- */
-        const LEADERBOARD_KEY = 'math_hero_leaderboard_v2';
+        const LEADERBOARD_KEY = 'math_hero_leaderboard_v3';
 
-        function saveHighScore(name, score, timeOrQuestions, mode) {
+        function saveHighScore(name, score, timeOrQuestions, mode, level, op, neg) {
             let scores = [];
             try { scores = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || []; } catch(e) {}
             
@@ -941,56 +1017,97 @@
                 name: name, 
                 score: score, 
                 metric: timeOrQuestions, // Time for Std, Questions for Blitz?
-                // Actually:
-                // Standard: Score / 20, Metric = Time taken (lower better)
-                // Blitz: Score (higher better), Metric = 60s (fixed)
                 mode: mode,
+                level: level,
+                op: op,
+                neg: neg,
                 date: new Date().toLocaleDateString() 
             });
             
-            // Sort: 
-            // 1. Blitz scores (Higher score is better)
-            // 2. Standard scores (Higher score is better, then Lower Time is better)
-            // It's easier to just sort by Score Descending generally, but separating logic is cleaner.
+            // Note: We don't limit list size here drastically because we filter later. 
+            // But to prevent infinite growth, maybe keep top 500?
+            if (scores.length > 500) scores.shift();
             
-            scores.sort((a, b) => {
-                // If modes differ, just keep order or group? Let's verify score first.
-                if (b.score !== a.score) return b.score - a.score;
-                // If same score
-                if (a.mode === 'standard' && b.mode === 'standard') return a.metric - b.metric; // Lower time wins
-                return 0; 
-            });
-            
-            // Keep top 5
-            scores = scores.slice(0, 5);
             localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(scores));
+        }
+
+        function toggleLeaderboardView() {
+            showAllScores = !showAllScores;
+            const btn = document.getElementById('leaderboardToggleBtn');
+            btn.innerText = showAllScores ? "Voir ma catégorie" : "Tout voir";
+            renderLeaderboard();
         }
 
         function renderLeaderboard() {
             let scores = [];
             try { scores = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || []; } catch(e) {}
             
+            // Subtitle
+            const subTitleEl = document.getElementById('leaderboardSubtitle');
+            
+            if (!showAllScores) {
+                // FILTERING LOGIC
+                let opLabel = selectedOperation === 'mix' ? 'Mixte' : selectedOperation;
+                let negLabel = allowNegative ? '(Négatifs)' : '';
+                let levelLabel = levelSelected.charAt(0).toUpperCase() + levelSelected.slice(1);
+                
+                subTitleEl.innerText = `Classement : ${gameMode === 'blitz' ? 'Blitz' : 'Entraînement'} • ${levelLabel} • ${opLabel} ${negLabel}`;
+
+                scores = scores.filter(s => 
+                    s.mode === gameMode &&
+                    s.level === levelSelected &&
+                    s.op === selectedOperation &&
+                    s.neg === allowNegative
+                );
+            } else {
+                subTitleEl.innerText = "Classement Global (Tous modes confondus)";
+            }
+
+            // SORTING LOGIC
+            scores.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score; // Higher score first
+                if (a.mode === 'standard' && b.mode === 'standard') return a.metric - b.metric; // Lower time first for standard
+                return 0; 
+            });
+
+            // Keep top 10 for display
+            const displayScores = scores.slice(0, 10);
+            
             const container = document.getElementById('leaderboardList');
-            if (scores.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#777; font-style:italic;">Aucun champion pour le moment.</p>';
+            if (displayScores.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#777; font-style:italic;">Aucun champion dans cette catégorie pour le moment. Soyez le premier !</p>';
                 return;
             }
             
-            let html = '<table class="leaderboard-table"><thead><tr><th>#</th><th>Nom</th><th>Mode</th><th>Score</th></tr></thead><tbody>';
-            scores.forEach((s, index) => {
+            let html = '<table class="leaderboard-table"><thead><tr><th>#</th><th>Nom</th><th>Détails</th><th>Score</th></tr></thead><tbody>';
+            
+            displayScores.forEach((s, index) => {
                 let rankClass = '';
                 if(index === 0) rankClass = 'rank-1';
                 else if(index === 1) rankClass = 'rank-2';
                 else if(index === 2) rankClass = 'rank-3';
 
-                let modeLabel = s.mode === 'blitz' ? '<span class="mode-badge mode-blitz">Blitz</span>' : '<span class="mode-badge mode-std">Entr.</span>';
+                // Badges generation
+                let detailsHTML = '';
+                if(s.mode === 'blitz') detailsHTML += '<span class="mode-badge badge-mode">Blitz</span> ';
+                else detailsHTML += '<span class="mode-badge badge-mode">Entr.</span> ';
+                
+                // Show more details if "Show All" is active
+                if (showAllScores) {
+                     let lShort = s.level === 'intermediaire' ? 'Inter.' : s.level;
+                     detailsHTML += `<span class="mode-badge badge-lvl">${lShort}</span> `;
+                     let opSymbol = s.op === 'mix' ? 'Mix' : s.op;
+                     detailsHTML += `<span class="mode-badge badge-lvl">${opSymbol}</span> `;
+                     if(s.neg) detailsHTML += `<span class="mode-badge badge-neg">Nég.</span>`;
+                }
+
                 let scoreDetail = s.mode === 'blitz' ? `${s.score} pts` : `${s.score}/20`;
                 let timeDetail = s.mode === 'blitz' ? '' : `<br><small>${s.metric}s</small>`;
 
                 html += `<tr>
                     <td class="${rankClass}">${index + 1}</td>
                     <td style="font-weight:600;">${s.name}</td>
-                    <td>${modeLabel}</td>
+                    <td>${detailsHTML}</td>
                     <td>${scoreDetail}${timeDetail}</td>
                 </tr>`;
             });
@@ -1003,9 +1120,15 @@
             stopTimer();
             
             let finalMetric = gameMode === 'standard' ? timeValue : 60;
-            saveHighScore(userName, correctAnswers, finalMetric, gameMode);
+            
+            // Save with all metadata
+            saveHighScore(userName, correctAnswers, finalMetric, gameMode, levelSelected, selectedOperation, allowNegative);
 
             showSection('results-section');
+            
+            // Reset view to "Contextual" by default
+            showAllScores = false;
+            document.getElementById('leaderboardToggleBtn').innerText = "Tout voir";
             renderLeaderboard();
             
             const scoreEl = document.getElementById('summary');
