@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Factorisation : De Zéro à Héro</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- React & ReactDOM (UMD) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: { DEFAULT: '#007bff', dark: '#0056b3' },
+              secondary: '#ffc107',
+              accent: { DEFAULT: '#28a745', dark: '#1c7430' },
+              error: '#dc3545',
+            },
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+              serif: ['Roboto Slab', 'serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { background-color: #f8f9fa; }
+      
+      /* Math Display Fixes */
+      .math-display { 
+          font-variant-numeric: tabular-nums; 
+          line-height: 1.5;
+      }
+      .math-term { display: inline-block; }
+      .math-op { margin: 0 0.3em; font-weight: 600; color: #0056b3; }
+      .math-display sup { 
+          font-size: 0.6em; 
+          vertical-align: super; 
+          margin-left: 1px;
+      }
+
+      /* Animations */
+      .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      
+      .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- Types & Enums ---
+        const Section = {
+            LEARN: 'learn',
+            EXERCISE: 'exercise',
+            TEST: 'test',
+            LEADERBOARD: 'leaderboard',
+            DIPLOMA: 'diploma'
+        };
+
+        const Difficulty = {
+            NORMAL: 'normal',
+            ADVANCED: 'advanced'
+        };
+
+        // --- Math Engine ---
+
+        const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        const coinFlip = () => Math.random() > 0.5;
+
+        // FIXED: Polynomial Formatting with Spans for better layout
+        function polyToHTML(coeffs, variable = 'x') {
+            let effectiveDegree = coeffs.length - 1;
+            while (effectiveDegree > 0 && coeffs[effectiveDegree] === 0) {
+                effectiveDegree--;
+            }
+            
+            if (effectiveDegree === 0 && coeffs[0] === 0) return "0";
+
+            let html = "";
+            let firstTerm = true;
+
+            for (let i = effectiveDegree; i >= 0; i--) {
+                const c = coeffs[i];
+                if (c === 0) continue;
+
+                const absC = Math.abs(c);
+                const sign = c < 0 ? "-" : "+";
+                
+                // Determine operator string
+                let opHtml = "";
+                if (firstTerm) {
+                    if (c < 0) opHtml = `<span class="math-op">-</span>`;
+                } else {
+                    opHtml = `<span class="math-op">${sign}</span>`;
+                }
+
+                // Determine Coefficient string
+                let strC = absC.toString();
+                if (absC === 1 && i > 0) strC = ""; // Hide 1 if variable exists
+
+                // Determine Power string
+                let powerHtml = "";
+                if (i === 1) powerHtml = variable;
+                else if (i > 1) powerHtml = `${variable}<sup>${i}</sup>`;
+
+                html += `<span class="math-term">${opHtml}${strC}${powerHtml}</span>`;
+                firstTerm = false;
+            }
+            return html;
+        }
+
+        // Polynomial Ops
+        function mulPolyScalar(p, k) { return p.map(c => c * k); }
+        function shiftPoly(p, shift) {
+            if (shift === 0) return [...p];
+            return new Array(shift).fill(0).concat(p);
+        }
+        function polyFromRoots(roots) {
+            let p = [1];
+            roots.forEach(r => {
+                const newP = new Array(p.length + 1).fill(0);
+                for (let i = 0; i < p.length; i++) {
+                    newP[i] += p[i] * (-r);
+                    newP[i+1] += p[i];
+                }
+                p = newP;
+            });
+            return p;
+        }
+
+        // --- Generators (Logic from Version 2, Enforced GCD) ---
+
+        function generateDiffSquares(difficulty) {
+            const v = coinFlip() ? 'x' : 'a';
+            const a = randomInt(1, difficulty === Difficulty.ADVANCED ? 5 : 3);
+            const b = randomInt(1, difficulty === Difficulty.ADVANCED ? 10 : 6);
+            const coeffs = [-(b*b), 0, (a*a)];
+            const termA = a === 1 ? v : `${a}${v}`;
+            return { coeffs, factored: `(${termA} - ${b})(${termA} + ${b})`, variable: v };
+        }
+
+        function generatePerfectSquare(difficulty) {
+            const v = 'x';
+            const a = randomInt(1, 4);
+            const b = randomInt(1, 6);
+            const sign = coinFlip() ? 1 : -1;
+            const coeffs = [b*b, 2*a*b*sign, a*a];
+            const op = sign > 0 ? '+' : '-';
+            const termA = a === 1 ? v : `${a}${v}`;
+            return { coeffs, factored: `(${termA} ${op} ${b})^2`, variable: v };
+        }
+
+        function generateHorner(difficulty) {
+            const v = 'x';
+            let roots = [randomInt(-3, 3), randomInt(-3, 3), randomInt(-3, 3)];
+            roots = roots.map(r => r === 0 ? 1 : r);
+            const coeffs = polyFromRoots(roots.map(r => -r)); // if root is -a, factor is (x+a)
+            const formatFactor = (val) => val === 0 ? v : (val > 0 ? `(${v} + ${val})` : `(${v} - ${Math.abs(val)})`);
+            const factored = `${formatFactor(roots[0])}${formatFactor(roots[1])}${formatFactor(roots[2])}`;
+            return { coeffs, factored, variable: v };
+        }
+
+        function generateProblem(difficulty) {
+            // 1. Base Problem
+            const typeRoll = Math.random();
+            let base;
+            if (typeRoll < 0.4) base = generateDiffSquares(difficulty);
+            else if (typeRoll < 0.7) base = generatePerfectSquare(difficulty);
+            else base = generateHorner(difficulty);
+
+            // 2. Enforce GCD (Mise en évidence)
+            // We want k != 1 to force the first step
+            let k;
+            do {
+                k = randomInt(-5, 5);
+            } while (k === 0 || k === 1); // Allow -1, but prevent 0 and 1
+
+            let xPower = 0;
+            if (Math.random() > 0.7) xPower = 1; // Sometimes add an x factor
+
+            // Apply GCD
+            let finalCoeffs = shiftPoly(base.coeffs, xPower);
+            finalCoeffs = mulPolyScalar(finalCoeffs, k);
+
+            // Build Answer String
+            let prefix = "";
+            if (k === -1) prefix = "-";
+            else if (k !== 1) prefix = k.toString();
+
+            if (xPower > 0) {
+                if (xPower === 1) prefix += base.variable;
+                else prefix += `${base.variable}^${xPower}`;
+            }
+
+            // Combine prefix + base answer
+            const finalFactored = `${prefix}${base.factored}`;
+
+            return {
+                id: Date.now().toString(),
+                questionHTML: polyToHTML(finalCoeffs, base.variable),
+                displayAnswer: finalFactored.replace(/\^/g, '<sup>').replace(/\$/g, '</sup>'),
+                answerKey: finalFactored,
+                verificationFunction: (userAns) => checkAlgebraicEquivalence(userAns, finalFactored, base.variable)
+            };
+        }
+
+        // Verification
+        function evaluateExpression(expr, val) {
+            try {
+                // Normalize: remove spaces, lowercase
+                let safeExpr = expr.replace(/\s/g, '').toLowerCase();
+                
+                // CRITICAL FIX: Handle ² and ³
+                safeExpr = safeExpr.replace(/²/g, '^2').replace(/³/g, '^3');
+
+                // Replace variable 'a' or 'x'
+                safeExpr = safeExpr.replace(/[ax]/g, `(${val})`);
+                
+                // Add implied multiplications: 2( -> 2*(, )2 -> )*2, )( -> )*(
+                safeExpr = safeExpr.replace(/(\d|\))(\()/g, '$1*$2');
+                safeExpr = safeExpr.replace(/(\))(\d|\()/g, '$1*$2');
+                
+                // Replace ^ with ** for JS math
+                safeExpr = safeExpr.replace(/\^/g, '**');
+
+                return new Function(`return ${safeExpr}`)();
+            } catch (e) { return NaN; }
+        }
+
+        function checkAlgebraicEquivalence(userExpr, correctExpr, variable) {
+            const points = [0, 1, -1, 2, -3];
+            // Basic syntax check: needs parenthesis
+            if (!userExpr.includes('(')) return false; 
+            
+            return points.every(p => {
+                const uVal = evaluateExpression(userExpr, p);
+                const cVal = evaluateExpression(correctExpr, p);
+                if (!isFinite(uVal) || !isFinite(cVal)) return false;
+                return Math.abs(uVal - cVal) < 0.001;
+            });
+        }
+
+        // --- Components ---
+
+        const Confetti = () => {
+            React.useEffect(() => {
+                const canvas = document.createElement('canvas');
+                Object.assign(canvas.style, {position:'fixed', top:'0', left:'0', width:'100%', height:'100%', pointerEvents:'none', zIndex:'9999'});
+                document.body.appendChild(canvas);
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const particles = Array.from({length: 100}, () => ({
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height,
+                    vx: Math.random() * 2 - 1, vy: Math.random() * 3 + 2,
+                    color: ['#007bff', '#ffc107', '#28a745', '#dc3545'][Math.floor(Math.random()*4)],
+                    size: Math.random() * 5 + 2
+                }));
+                let animId;
+                const render = () => {
+                    ctx.clearRect(0,0,canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        p.x += p.vx; p.y += p.vy;
+                        if(p.y > canvas.height) p.y = -10;
+                        ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size);
+                    });
+                    animId = requestAnimationFrame(render);
+                };
+                render();
+                return () => { cancelAnimationFrame(animId); document.body.removeChild(canvas); };
+            }, []);
+            return null;
+        };
+
+        const Learn = () => {
+            const [activeTab, setActiveTab] = React.useState(0);
+            const steps = [
+                {
+                title: "0. La Règle d'Or",
+                content: (
+                    <div className="space-y-4">
+                    <h3 className="text-xl font-bold text-primary-dark">Toujours commencer par ceci !</h3>
+                    <p className="text-gray-700">
+                        Avant toute chose, regarde ton expression algébrique. Peux-tu effectuer une <strong className="text-accent-dark">Mise en évidence (PGCD)</strong> ?
+                    </p>
+                    <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-primary">
+                        <p className="font-mono text-lg">Exemple : 12a<sup>2</sup> + 8a<sup>3</sup></p>
+                        <p className="mt-2">Le PGCD de 12 et 8 est <strong className="text-primary">4</strong>.</p>
+                        <p>Le PGCD de a<sup>2</sup> et a<sup>3</sup> est <strong className="text-primary">a<sup>2</sup></strong>.</p>
+                        <p className="mt-2 text-xl font-bold text-accent-dark">&rarr; 4a<sup>2</sup>(3 + 2a)</p>
+                    </div>
+                    <p className="text-sm italic text-gray-500">Une fois cela fait, compte le nombre de termes dans la parenthèse.</p>
+                    </div>
+                )
+                },
+                {
+                title: "1. Deux Termes",
+                content: (
+                    <div className="space-y-4">
+                    <h3 className="text-xl font-bold text-primary-dark">Binôme (2 termes)</h3>
+                    <p>Si tu as deux termes séparés par un signe moins, vérifie si c'est une <strong>Différence de Carrés</strong>.</p>
+                    
+                    <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-secondary">
+                        <h4 className="font-bold text-secondary-dark mb-2">Binômes Conjugués</h4>
+                        <p className="text-xl font-mono text-center mb-2">a<sup>2</sup> - b<sup>2</sup> = (a - b)(a + b)</p>
+                        <hr className="border-secondary my-2 opacity-30"/>
+                        <p>Exemple : <span className="font-mono">x<sup>2</sup> - 9</span> &rarr; <span className="font-mono text-accent-dark">(x - 3)(x + 3)</span></p>
+                    </div>
+
+                    <p className="mt-4">Si ce n'est pas un carré parfait, ou si c'est une somme, tu devras peut-être utiliser la <strong className="text-purple-600">Loi du reste (Horner)</strong> si la puissance est 3 ou plus.</p>
+                    </div>
+                )
+                },
+                {
+                title: "2. Trois Termes",
+                content: (
+                    <div className="space-y-4">
+                    <h3 className="text-xl font-bold text-primary-dark">Trinôme (3 termes)</h3>
+                    <p>Cherche d'abord un <strong>Carré Parfait</strong>.</p>
+
+                    <div className="bg-green-50 p-4 rounded-lg border-l-4 border-accent">
+                        <h4 className="font-bold text-accent-dark mb-2">Identités Remarquables</h4>
+                        <div className="space-y-2 font-mono text-lg">
+                        <p>a<sup>2</sup> + 2ab + b<sup>2</sup> = (a + b)<sup>2</sup></p>
+                        <p>a<sup>2</sup> - 2ab + b<sup>2</sup> = (a - b)<sup>2</sup></p>
+                        </div>
+                        <p className="mt-2 text-sm text-gray-600">Astuce: Vérifie que le terme du milieu est bien le double produit des racines des extrémités !</p>
+                    </div>
+
+                    <p>Si cela ne fonctionne pas, utilise la méthode de la <strong>Somme et Produit</strong> (si quadratique) ou la <strong>Loi du Reste (Horner)</strong>.</p>
+                    </div>
+                )
+                },
+                {
+                title: "3. Horner",
+                content: (
+                    <div className="space-y-4">
+                    <h3 className="text-xl font-bold text-primary-dark">Loi du Reste (Horner)</h3>
+                    <p>L'arme ultime pour factoriser n'importe quel polynôme P(x).</p>
+                    
+                    <div className="bg-gray-100 p-4 rounded-lg border border-gray-300">
+                        <ol className="list-decimal list-inside space-y-2">
+                        <li>Lister tous les <strong>diviseurs</strong> du terme indépendant (le nombre seul à la fin).</li>
+                        <li>Remplacer <em>x</em> par ces diviseurs jusqu'à ce que P(a) = 0.</li>
+                        <li>Si P(a) = 0, alors le polynôme est divisible par <strong>(x - a)</strong>.</li>
+                        <li>Effectuer la division avec le <strong>Tableau de Horner</strong>.</li>
+                        <li>Écrire la réponse : P(x) = (x - a) &middot; Q(x).</li>
+                        </ol>
+                    </div>
+                    <p className="text-sm text-red-500 italic">Attention aux signes dans le tableau !</p>
+                    </div>
+                )
+                }
+            ];
+
+            return (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-fade-in">
+                    <div className="flex flex-wrap border-b bg-gray-50">
+                        {steps.map((step, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => setActiveTab(idx)}
+                            className={`flex-1 py-4 px-2 text-center font-semibold text-sm sm:text-base transition-colors duration-200
+                            ${activeTab === idx 
+                                ? 'bg-white text-primary border-b-2 border-primary' 
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+                        >
+                            {step.title}
+                        </button>
+                        ))}
+                    </div>
+                    <div className="p-6 min-h-[300px] flex flex-col justify-center">
+                        {steps[activeTab].content}
+                    </div>
+                    <div className="p-4 bg-gray-50 border-t flex justify-between">
+                        <button 
+                        disabled={activeTab === 0}
+                        onClick={() => setActiveTab(p => p - 1)}
+                        className="px-4 py-2 rounded text-sm font-semibold text-gray-600 disabled:opacity-30 hover:bg-gray-200"
+                        >
+                        &larr; Précédent
+                        </button>
+                        <button 
+                        disabled={activeTab === steps.length - 1}
+                        onClick={() => setActiveTab(p => p + 1)}
+                        className="px-4 py-2 rounded text-sm font-semibold text-white bg-primary hover:bg-primary-dark disabled:opacity-30"
+                        >
+                        Suivant &rarr;
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const Quiz = ({ mode, difficulty, onFinish, userName }) => {
+            const TOTAL = mode === 'test' ? 20 : 10;
+            // FIXED: 10 mins (600s) for exercise, 20 mins (1200s) for test
+            const TIME = mode === 'test' ? 1200 : 600;
+            
+            const [problem, setProblem] = React.useState(null);
+            const [idx, setIdx] = React.useState(0);
+            const [ans, setAns] = React.useState("");
+            const [score, setScore] = React.useState(0);
+            const [time, setTime] = React.useState(TIME);
+            const [feedback, setFeedback] = React.useState(null);
+            const [streak, setStreak] = React.useState(0);
+            const [finished, setFinished] = React.useState(false);
+
+            React.useEffect(() => {
+                newProblem();
+                const timer = setInterval(() => setTime(t => t<=1 ? (clearInterval(timer)||handleFinish()||0) : t-1), 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            const newProblem = () => { setProblem(generateProblem(difficulty)); setAns(""); setFeedback(null); };
+            const handleFinish = () => { setFinished(true); setTimeout(() => onFinish(score, TOTAL), 100); };
+
+            const submit = (e) => {
+                e.preventDefault();
+                if (!problem || feedback) return;
+                const correct = problem.verificationFunction(ans);
+                if (correct) {
+                    setScore(s => s + 1); 
+                    setStreak(s => s + 1); // Increment streak
+                    setFeedback({ type: 'success', msg: "Correct !" });
+                } else {
+                    setStreak(0); // Reset streak
+                    setFeedback({ type: 'error', msg: `Incorrect. Réponse : ${problem.displayAnswer}` });
+                }
+                setTimeout(() => {
+                    if (idx + 1 >= TOTAL) handleFinish();
+                    else { setIdx(i => i + 1); newProblem(); }
+                }, correct ? 1000 : 3000);
+            };
+
+            if (finished) return <div className="text-center p-10 font-bold text-2xl text-primary">Calcul du résultat...</div>;
+
+            return (
+                <div className="max-w-2xl mx-auto">
+                    <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm mb-6">
+                        <div>
+                            <div className="text-sm text-gray-500">{mode === 'test' ? `Candidat: ${userName}` : 'Mode Entraînement'}</div>
+                            <div className="font-bold text-primary">Question {idx + 1} / {TOTAL}</div>
+                        </div>
+                        <div className="text-right">
+                            <div className={`font-mono font-bold text-lg ${time < 60 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>
+                                ⏱ {Math.floor(time/60)}:{(time%60).toString().padStart(2,'0')}
+                            </div>
+                            {/* FIXED: Show streak if > 0 */}
+                            {streak > 0 && <div className="text-sm font-bold text-orange-500 animate-pop">🔥 Série: {streak}</div>}
+                        </div>
+                    </div>
+                    <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100 text-center relative overflow-hidden">
+                        <h3 className="text-gray-400 uppercase tracking-widest text-xs font-bold mb-6">Factorise l'expression suivante</h3>
+                        {problem && <div className="text-4xl md:text-5xl font-serif text-primary-dark mb-10 math-display" dangerouslySetInnerHTML={{__html: problem.questionHTML}} />}
+                        <form onSubmit={submit}>
+                            <input 
+                                type="text" 
+                                value={ans} 
+                                onChange={e => setAns(e.target.value)} 
+                                className="w-full text-center text-2xl p-4 border-2 border-gray-200 rounded-lg focus:border-primary focus:ring-4 focus:ring-blue-50 outline-none transition-all" 
+                                placeholder="Ex: 5(x-4)^2" 
+                                autoFocus 
+                                disabled={!!feedback} 
+                            />
+                            {/* FIXED: Updated instruction */}
+                            <p className="text-xs text-gray-400 mt-2">Astuce : Tu peux écrire ^2 ou ² pour les carrés.</p>
+                            <button type="submit" disabled={!ans || !!feedback} className="mt-6 w-full py-4 bg-accent hover:bg-accent-dark text-white rounded-lg font-bold text-lg shadow-md transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed">Valider</button>
+                        </form>
+                    </div>
+                    {feedback && (
+                        <div className={`mt-4 p-4 rounded-lg text-center font-bold text-lg animate-bounce ${feedback.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            {feedback.type === 'success' ? '✅ ' : '❌ '} 
+                            <span dangerouslySetInnerHTML={{__html: feedback.msg}} />
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const Leaderboard = () => {
+            const [scores, setScores] = React.useState([]);
+            React.useEffect(() => { try { const s = localStorage.getItem('factor_hero_scores'); if (s) setScores(JSON.parse(s)); } catch(e) {} }, []);
+            return (
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h2 className="text-2xl font-serif font-bold text-center text-primary-dark mb-6">🏆 Tableau des Champions</h2>
+                    {scores.length === 0 ? <p className="text-center text-gray-500 italic">Aucun score enregistré.</p> : (
+                        <table className="w-full">
+                            <thead><tr className="bg-primary text-white"><th className="p-3 text-left rounded-tl">Rang</th><th className="p-3 text-left">Nom</th><th className="p-3 text-right rounded-tr">Score</th></tr></thead>
+                            <tbody>{scores.map((s, i) => <tr key={i} className="border-b hover:bg-gray-50"><td className="p-3 font-bold">{i+1}</td><td className="p-3">{s.name}</td><td className="p-3 text-right font-bold text-accent">{s.score}/20</td></tr>)}</tbody>
+                        </table>
+                    )}
+                    <button onClick={() => { localStorage.removeItem('factor_hero_scores'); setScores([]); }} className="block mx-auto mt-6 text-red-400 text-sm hover:text-red-600 underline">Effacer</button>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [section, setSection] = React.useState(Section.LEARN);
+            const [difficulty, setDifficulty] = React.useState(Difficulty.NORMAL);
+            const [name, setName] = React.useState("");
+            const [lastScore, setLastScore] = React.useState(null);
+            
+            const finish = (score, total) => {
+                if(section === Section.TEST) {
+                    try { const s = JSON.parse(localStorage.getItem('factor_hero_scores') || "[]"); s.push({name:name||"Anonyme",score,date:new Date().toLocaleDateString()}); s.sort((a,b)=>b.score-a.score); localStorage.setItem('factor_hero_scores',JSON.stringify(s.slice(0,10))); } catch(e){}
+                    setLastScore({score, total});
+                } else { alert(`Score : ${score}/${total}`); setSection(Section.LEARN); }
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col font-sans text-gray-800">
+                    <header className="bg-white shadow-sm sticky top-0 z-50">
+                        <div className="container mx-auto px-4 py-3">
+                            <h1 className="text-2xl md:text-3xl font-serif font-bold text-primary text-center mb-4">🚀 Factorisation : De Zéro à Héro</h1>
+                            <nav className="flex justify-center gap-2 md:gap-4 flex-wrap">
+                                <button onClick={() => setSection(Section.LEARN)} className={`px-4 py-2 rounded-full font-semibold text-sm transition ${section === Section.LEARN ? 'bg-accent text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>📖 Apprendre</button>
+                                <button onClick={() => setSection(Section.EXERCISE)} className={`px-4 py-2 rounded-full font-semibold text-sm transition ${section === Section.EXERCISE ? 'bg-accent text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>✏️ Entraînement</button>
+                                <button onClick={() => setSection(Section.TEST)} className={`px-4 py-2 rounded-full font-semibold text-sm transition ${section === Section.TEST ? 'bg-accent text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>🏆 Test Final</button>
+                                <button onClick={() => setSection(Section.LEADERBOARD)} className={`px-4 py-2 rounded-full font-semibold text-sm transition ${section === Section.LEADERBOARD ? 'bg-accent text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>📊 Classement</button>
+                            </nav>
+                        </div>
+                    </header>
+                    <main className="flex-grow container mx-auto px-4 py-8 max-w-4xl relative">
+                        {section === Section.LEARN && <Learn />}
+                        {section === Section.EXERCISE && <div className="animate-fade-in"><h2 className="text-2xl font-serif text-center text-primary-dark mb-6">Entraînement Intensif</h2><Quiz mode="exercise" difficulty={difficulty} onFinish={finish} /></div>}
+                        {section === Section.TEST && <div className="animate-fade-in">
+                            <h2 className="text-2xl font-serif text-center text-accent-dark mb-6">Test de Certification</h2>
+                            {lastScore ? <div className="text-center bg-white p-8 rounded-xl shadow-lg">{lastScore.score>=15&&<Confetti />}<div className="text-6xl mb-4">{lastScore.score>=15?'🎓':'📝'}</div><h3 className="text-2xl font-bold">Terminé ! Score: {lastScore.score}/{lastScore.total}</h3><button onClick={()=>{setLastScore(null);setSection(Section.LEARN)}} className="mt-6 px-6 py-2 bg-primary text-white rounded-lg">Retour</button></div> : 
+                            !name ? <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow text-center"><p className="mb-4">Entre ton nom de champion :</p><input type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full p-3 border rounded mb-4 text-center" /><button disabled={!name} onClick={()=>setName(name)} className="w-full bg-accent text-white py-3 rounded font-bold disabled:opacity-50">Commencer</button></div> : <Quiz mode="test" difficulty={difficulty} onFinish={finish} userName={name} />}
+                        </div>}
+                        {section === Section.LEADERBOARD && <Leaderboard />}
+                    </main>
+                    <footer className="text-center py-6 text-gray-400 text-sm">&copy; 2024 Les Fractions de Zéro à Héro - Single File Edition</footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
