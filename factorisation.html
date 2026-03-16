@@ -164,7 +164,6 @@
         // --- Generators ---
 
         function generateDiffSquares(difficulty) {
-            // CORRECTION ICI: Forcer l'utilisation de 'x' au lieu de coinFlip() ? 'x' : 'a'
             const v = 'x'; 
             const a = randomInt(1, difficulty === Difficulty.ADVANCED ? 5 : 3);
             const b = randomInt(1, difficulty === Difficulty.ADVANCED ? 10 : 6);
@@ -435,6 +434,39 @@
             );
         };
 
+        // --- NOUVEAU COMPOSANT : Tableau d'Archives ---
+        const ArchiveTable = ({ archive }) => (
+            <div className="mt-8 overflow-x-auto text-left">
+                <h3 className="text-xl font-bold text-primary-dark mb-4 text-center">Détail de tes réponses</h3>
+                <table className="w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden text-sm md:text-base">
+                    <thead className="bg-gray-100">
+                        <tr>
+                            <th className="p-3 border-b text-center">N°</th>
+                            <th className="p-3 border-b">Question</th>
+                            <th className="p-3 border-b">Ta réponse</th>
+                            <th className="p-3 border-b">Bonne réponse</th>
+                            <th className="p-3 border-b text-center">Résultat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {archive.map((item, i) => (
+                            <tr key={i} className="border-b hover:bg-gray-50">
+                                <td className="p-3 text-center font-bold text-gray-500">{i + 1}</td>
+                                <td className="p-3 font-mono text-lg math-display" dangerouslySetInnerHTML={{__html: item.questionHTML}}></td>
+                                <td className={`p-3 font-mono ${item.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                                    {item.userAnswer || <span className="italic text-gray-400">Vide / Temps écoulé</span>}
+                                </td>
+                                <td className="p-3 font-mono text-primary font-bold" dangerouslySetInnerHTML={{__html: item.correctAnswer}}></td>
+                                <td className="p-3 text-center text-xl">
+                                    {item.isCorrect ? '✅' : '❌'}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        );
+
         const Quiz = ({ mode, difficulty, onFinish, userName }) => {
             const TOTAL = mode === 'test' ? 20 : 10;
             const TIME = mode === 'test' ? 1200 : 600;
@@ -457,6 +489,9 @@
             const [feedback, setFeedback] = React.useState(null);
             const [streak, setStreak] = React.useState(0);
             const [finished, setFinished] = React.useState(false);
+            
+            // NOUVEAU : On utilise une ref pour mémoriser l'archive sans être bloqué par les fermetures (closures) de react
+            const archiveRef = React.useRef([]);
 
             React.useEffect(() => {
                 newProblem(0); 
@@ -471,12 +506,26 @@
                 setFeedback(null); 
             };
             
-            const handleFinish = () => { setFinished(true); setTimeout(() => onFinish(score, TOTAL), 100); };
+            // MODIFIÉ : On transmet les archives à la fonction onFinish
+            const handleFinish = () => { 
+                setFinished(true); 
+                setTimeout(() => onFinish(score, TOTAL, archiveRef.current), 100); 
+            };
 
             const submit = (e) => {
                 e.preventDefault();
                 if (!problem || feedback) return;
+                
                 const correct = problem.verificationFunction(ans);
+                
+                // NOUVEAU : Ajout de la question et de la réponse dans l'archive
+                archiveRef.current.push({
+                    questionHTML: problem.questionHTML,
+                    userAnswer: ans,
+                    correctAnswer: problem.displayAnswer,
+                    isCorrect: correct
+                });
+
                 if (correct) {
                     setScore(s => s + 1); 
                     setStreak(s => s + 1); 
@@ -485,6 +534,7 @@
                     setStreak(0); 
                     setFeedback({ type: 'error', msg: `Incorrect. Réponse : ${problem.displayAnswer}` });
                 }
+                
                 setTimeout(() => {
                     if (idx + 1 >= TOTAL) {
                         handleFinish();
@@ -496,7 +546,7 @@
                 }, correct ? 1000 : 3000);
             };
 
-            if (finished) return <div className="text-center p-10 font-bold text-2xl text-primary">Calcul du résultat...</div>;
+            if (finished) return <div className="text-center p-10 font-bold text-2xl text-primary animate-pulse">Calcul du résultat...</div>;
 
             return (
                 <div className="max-w-2xl mx-auto">
@@ -560,11 +610,14 @@
             const [section, setSection] = React.useState(Section.LEARN);
             const [difficulty, setDifficulty] = React.useState(Difficulty.NORMAL);
             const [name, setName] = React.useState("");
-            const [lastScore, setLastScore] = React.useState(null);
+            
+            // MODIFIÉ : lastScore va maintenant contenir {score, total, archiveData}
+            const [lastScore, setLastScore] = React.useState(null); 
             
             const [testStarted, setTestStarted] = React.useState(false);
             
-            const finish = (score, total) => {
+            // MODIFIÉ : On récupère l'archive
+            const finish = (score, total, archiveData) => {
                 if(section === Section.TEST) {
                     try { 
                         const s = JSON.parse(localStorage.getItem('factor_hero_scores') || "[]"); 
@@ -572,17 +625,43 @@
                         s.sort((a,b)=>b.score-a.score); 
                         localStorage.setItem('factor_hero_scores',JSON.stringify(s.slice(0,10))); 
                     } catch(e){}
-                    setLastScore({score, total});
-                    setTestStarted(false); 
-                } else { 
-                    alert(`Score : ${score}/${total}`); 
-                    setSection(Section.LEARN); 
-                }
+                } 
+                
+                // Que ce soit en Entraînement ou en Test, on affiche la page de résultat avec les archives
+                setLastScore({score, total, archive: archiveData});
+                setTestStarted(false); 
             };
 
             const changeSection = (newSection) => {
                 setSection(newSection);
                 setTestStarted(false);
+                setLastScore(null); // Réinitialise l'écran de résultat si on change de section
+            };
+
+            // NOUVEAU : Rendu de l'écran de résultat (commun au test et à l'entraînement)
+            const renderResults = () => {
+                // Pour déclencher les confettis si le score est de 75% ou plus
+                const isSuccess = lastScore.score >= (lastScore.total * 0.75);
+                
+                return (
+                    <div className="animate-fade-in w-full">
+                        <div className="text-center bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl mx-auto">
+                            {isSuccess && <Confetti />}
+                            <div className="text-6xl mb-4">{isSuccess ? '🎓' : '📝'}</div>
+                            <h3 className="text-2xl font-bold">Session Terminée !</h3>
+                            <p className="text-xl text-primary mt-2">Score : {lastScore.score} / {lastScore.total}</p>
+                            
+                            {/* Affichage de l'archive ici */}
+                            {lastScore.archive && lastScore.archive.length > 0 && (
+                                <ArchiveTable archive={lastScore.archive} />
+                            )}
+
+                            <button onClick={() => { setLastScore(null); changeSection(Section.LEARN); }} className="mt-8 px-8 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-bold shadow-md transition-all">
+                                Retour à l'accueil
+                            </button>
+                        </div> 
+                    </div>
+                );
             };
 
             return (
@@ -598,29 +677,40 @@
                             </nav>
                         </div>
                     </header>
-                    <main className="flex-grow container mx-auto px-4 py-8 max-w-4xl relative">
-                        {section === Section.LEARN && <Learn />}
-                        {section === Section.EXERCISE && <div className="animate-fade-in"><h2 className="text-2xl font-serif text-center text-primary-dark mb-6">Entraînement Intensif</h2><Quiz mode="exercise" difficulty={difficulty} onFinish={finish} /></div>}
-                        {section === Section.TEST && <div className="animate-fade-in">
-                            <h2 className="text-2xl font-serif text-center text-accent-dark mb-6">Test de Certification</h2>
-                            {lastScore ? (
-                                <div className="text-center bg-white p-8 rounded-xl shadow-lg">
-                                    {lastScore.score>=15&&<Confetti />}
-                                    <div className="text-6xl mb-4">{lastScore.score>=15?'🎓':'📝'}</div>
-                                    <h3 className="text-2xl font-bold">Terminé ! Score: {lastScore.score}/{lastScore.total}</h3>
-                                    <button onClick={()=>{setLastScore(null);changeSection(Section.LEARN)}} className="mt-6 px-6 py-2 bg-primary text-white rounded-lg">Retour</button>
-                                </div> 
-                            ) : !testStarted ? (
-                                <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow text-center">
-                                    <p className="mb-4">Entre ton nom de champion :</p>
-                                    <input type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full p-3 border rounded mb-4 text-center" />
-                                    <button disabled={!name.trim()} onClick={()=>setTestStarted(true)} className="w-full bg-accent text-white py-3 rounded font-bold disabled:opacity-50">Commencer</button>
-                                </div>
-                            ) : (
-                                <Quiz mode="test" difficulty={difficulty} onFinish={finish} userName={name} />
-                            )}
-                        </div>}
-                        {section === Section.LEADERBOARD && <Leaderboard />}
+                    
+                    <main className="flex-grow container mx-auto px-4 py-8 max-w-4xl relative w-full">
+                        {/* Si on a un score à afficher, on montre l'écran des archives peu importe la section */}
+                        {lastScore ? (
+                            renderResults()
+                        ) : (
+                            <>
+                                {section === Section.LEARN && <Learn />}
+                                
+                                {section === Section.EXERCISE && (
+                                    <div className="animate-fade-in">
+                                        <h2 className="text-2xl font-serif text-center text-primary-dark mb-6">Entraînement Intensif</h2>
+                                        <Quiz mode="exercise" difficulty={difficulty} onFinish={finish} />
+                                    </div>
+                                )}
+                                
+                                {section === Section.TEST && (
+                                    <div className="animate-fade-in">
+                                        <h2 className="text-2xl font-serif text-center text-accent-dark mb-6">Test de Certification</h2>
+                                        {!testStarted ? (
+                                            <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow text-center">
+                                                <p className="mb-4">Entre ton nom de champion :</p>
+                                                <input type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full p-3 border rounded mb-4 text-center" />
+                                                <button disabled={!name.trim()} onClick={()=>setTestStarted(true)} className="w-full bg-accent text-white py-3 rounded font-bold disabled:opacity-50">Commencer</button>
+                                            </div>
+                                        ) : (
+                                            <Quiz mode="test" difficulty={difficulty} onFinish={finish} userName={name} />
+                                        )}
+                                    </div>
+                                )}
+                                
+                                {section === Section.LEADERBOARD && <Leaderboard />}
+                            </>
+                        )}
                     </main>
                     <footer className="text-center py-6 text-gray-400 text-sm">&copy; 2026 Les Fractions de Zéro à Héro</footer>
                 </div>
