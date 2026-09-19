@@ -21,7 +21,7 @@
             <h1 class="text-2xl font-bold flex items-center gap-2">
                 <span>🧪</span> Assistant Chimie : Classification & Nomenclature
             </h1>
-            <p class="text-indigo-200 text-sm">Outil pédagogique interactif (90 questions expert)</p>
+            <p class="text-indigo-200 text-sm">Outil pédagogique interactif (Rapport d'évaluation de 20 questions)</p>
         </div>
     </header>
 
@@ -31,7 +31,7 @@
             <button onclick="switchTab('guide')" id="nav-guide" class="px-4 py-2 font-medium rounded-lg text-indigo-600 bg-indigo-50 transition whitespace-nowrap">🧭 Guide Interactif</button>
             <button onclick="switchTab('quiz')" id="nav-quiz" class="px-4 py-2 font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">✍️ Quiz QCM (24 q.)</button>
             <button onclick="switchTab('atelier')" id="nav-atelier" class="px-4 py-2 font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">🧪 Atelier (36 m.)</button>
-            <button onclick="switchTab('expert')" id="nav-expert" class="px-4 py-2 font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">⌨️ Mode Expert (90 q.)</button>
+            <button onclick="switchTab('expert')" id="nav-expert" class="px-4 py-2 font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">⌨️ Mode Expert (Session de 20 q.)</button>
             <button onclick="switchTab('memo')" id="nav-memo" class="px-4 py-2 font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">📖 Aide-mémoire</button>
         </div>
     </div>
@@ -73,15 +73,15 @@
             </div>
         </div>
 
-        <!-- ONGLET 4 : MODE EXPERT (90 QUESTIONS) -->
+        <!-- ONGLET 4 : MODE EXPERT (SESSION DE 20 QUESTIONS) -->
         <div id="tab-expert" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
                     <div>
-                        <h2 class="text-xl font-bold text-indigo-700">⌨️ Mode Expert : Saisie Libre (90 questions)</h2>
-                        <p class="text-gray-600 text-sm">Tapez la réponse attendue. <b>Attention aux majuscules/minuscules</b> pour les formules chimiques (ex : <code class="bg-gray-100 px-1 py-0.5 rounded text-indigo-600">Ca(OH)2</code>).</p>
+                        <h2 class="text-xl font-bold text-indigo-700">⌨️ Mode Expert : Auto-évaluation (20 questions)</h2>
+                        <p class="text-gray-600 text-sm">Répondez à la série complète. Un rapport détaillé s'affichera à la fin.</p>
                     </div>
-                    <span id="expert-score" class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-4 py-1.5 rounded-full">Score Expert : 0 pts</span>
+                    <span id="expert-score" class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-4 py-1.5 rounded-full">Score Session : 0 pts</span>
                 </div>
                 <div id="expert-container" class="bg-slate-50 p-6 rounded-xl border space-y-4"></div>
             </div>
@@ -93,9 +93,9 @@
                 <div class="bg-white p-6 rounded-xl shadow-sm border">
                     <h3 class="text-lg font-bold text-indigo-700 mb-4 border-b pb-2">⚡ Valences des Groupements & Métaux</h3>
                     <ul class="space-y-3">
-                        <li class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-semibold text-gray-700">Valence I</span><span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded text-sm font-medium">OH⁻, NO₃⁻, Na⁺, K⁺</span></li>
-                        <li class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-semibold text-gray-700">Valence II</span><span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded text-sm font-medium">SO₄²⁻, CO₃²⁻, Ca²⁺, Fe²⁺, Cu²⁺</span></li>
-                        <li class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-semibold text-gray-700">Valence III</span><span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded text-sm font-medium">PO₄³⁻, Al³⁺, Fe³⁺</span></li>
+                        <li class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-semibold text-gray-700">Valence I</span><span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded text-sm font-medium">OH⁻, NO₃⁻</span></li>
+                        <li class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-semibold text-gray-700">Valence II</span><span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded text-sm font-medium">SO₄²⁻, CO₃²⁻</span></li>
+                        <li class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-semibold text-gray-700">Valence III</span><span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded text-sm font-medium">PO₄³⁻</span></li>
                     </ul>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-sm border">
@@ -116,7 +116,7 @@
 
     <!-- Pied de page -->
     <footer class="bg-white border-t mt-12 py-4 text-center text-sm text-gray-500">
-        Application pédagogique de chimie - Fichier HTML unique
+        Classification 3G/4G
     </footer>
 
     <!-- Script JavaScript -->
@@ -143,7 +143,7 @@
                 loadAtelierQuestion();
             }
             if(tabName === 'expert' && expertState.pool.length === 0) {
-                loadExpertQuestion();
+                resetExpertSession();
             }
         }
 
@@ -157,7 +157,7 @@
             corps_mineral: { question: "Quelles sont les propriétés de ce corps minéral ?", options: [
                 { text: "Tournesol rouge (+), réagit avec les métaux (+), électricité (+)", next: "acide" },
                 { text: "Tournesol bleu (+), pas de réaction métaux (-), électricité (+)", result: "🧪 <b>Hydroxyde (MOH)</b>" },
-                { text: "Tournesol neutre (-), pas de réaction métaux (-), électricité (+)", next: "sel" },
+                { text: "Tournesol neutre (-), pas de réaction métaux (-), électricité (+)", result: "sel" },
                 { text: "Oxyde (contient de l'Oxygène O)", next: "oxyde" }
             ]},
             acide: { question: "De quel type d'acide s'agit-il ?", options: [{ text: "Acide binaire (HX)", result: "⚗️ <b>Hydracide (HX)</b>" }, { text: "Acide ternaire (HXO)", result: "⚗️ <b>Oxacide (HXO)</b>" }] },
@@ -289,9 +289,12 @@
             { formula: "KNO3", name: "nitrate de potassium" },
             { formula: "Ca3(PO4)2", name: "phosphate de calcium" },
             { formula: "CO2", name: "dioxyde de carbone" },
+            { formula: "CO", name: "monoxyde d'azote" },
             { formula: "SO3", name: "trioxyde de soufre" },
             { formula: "SO2", name: "dioxyde de soufre" },
             { formula: "NO2", name: "dioxyde d'azote" },
+            { formula: "N2O3", name: "hémitrioxyde d'azote" },
+            { formula: "P2O5", name: "hémipentoxyde d'azote" },
             { formula: "CaO", name: "oxyde de calcium" },
             { formula: "Na2O", name: "oxyde de sodium" },
             { formula: "FeO", name: "oxyde de fer (II)" },
@@ -351,7 +354,7 @@
         }
 
 
-        // --- 4. MODE EXPERT (90 questions au total) ---
+        // --- 4. MODE EXPERT (Session de 20 questions) ---
         const expertPool = [
             { prompt: "Écrivez la formule de l'hydroxyde de calcium", acceptable: ["Ca(OH)2"], isFormula: true },
             { prompt: "Écrivez la formule de l'acide sulfurique", acceptable: ["H2SO4"], isFormula: true },
@@ -383,7 +386,6 @@
             { prompt: "Quel préfixe utilise-t-on pour un rapport de 5/2 (nO/nX) dans un oxyde ?", acceptable: ["hémipent", "hemipent"], isFormula: false },
             { prompt: "Quelle est la valence du groupement nitrate (NO₃) ?", acceptable: ["1", "i", "valence i"], isFormula: false },
             { prompt: "Quelle est la valence du groupement sulfate (SO₄) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
-            // 60 questions supplémentaires pour tripler à nouveau le mode expert
             { prompt: "Écrivez la formule de l'acide phosphorique", acceptable: ["H3PO4"], isFormula: true },
             { prompt: "Écrivez la formule de l'acide carbonique", acceptable: ["H2CO3"], isFormula: true },
             { prompt: "Écrivez la formule de l'acide sulfureux", acceptable: ["H2SO3"], isFormula: true },
@@ -404,16 +406,22 @@
             { prompt: "Écrivez la formule du nitrate de potassium", acceptable: ["KNO3"], isFormula: true },
             { prompt: "Écrivez la formule de l'oxyde de fer (II)", acceptable: ["FeO"], isFormula: true },
             { prompt: "Écrivez la formule du phosphate de calcium", acceptable: ["Ca3(PO4)2"], isFormula: true },
-            { prompt: "Quel est le nom exact associé à la formule HI ?", acceptable: ["iodure d'hydrogene", "ioduredhydrogene"], isFormula: false },
-            { prompt: "Quel est le nom exact associé à la formule H3PO4 ?", acceptable: ["phosphate d'hydrogene", "phosphatedhydrogene"], isFormula: false },
-            { prompt: "Quel est le nom exact associé à la formule KOH ?", acceptable: ["hydroxyde de potassium", "hydroxydedepotassium"], isFormula: false },
-            { prompt: "Quel est le nom exact associé à la formule Mg(OH)2 ?", acceptable: ["hydroxyde de magnesium", "hydroxydedemagnesium"], isFormula: false },
-            { prompt: "Quel est le nom exact associé à la formule Al(OH)3 ?", acceptable: ["hydroxyde d'aluminium", "hydroxydedaluminium"], isFormula: false },
-            { prompt: "Quel est le nom exact associé à la formule ZnCl2 ?", acceptable: ["chlorure de zinc", "chloruredezinc"], isFormula: false },
-            { prompt: "Quel est le nom exact associé à la formule AgNO3 ?", acceptable: ["nitrate d'argent", "nitratedargent"], isFormula: false },
-            { prompt: "Quel est le nom exact associé à la formule SO2 ?", acceptable: ["dioxyde de soufre", "dioxydedesoufre"], isFormula: false },
-            { prompt: "Quel est le nom exact associé à la formule Na2O ?", acceptable: ["oxyde de sodium", "oxydedesodium"], isFormula: false },
-            { prompt: "Quel est le nom exact associé à la formule FeO ?", acceptable: ["oxyde de fer ii", "oxydedeferii", "oxyde de fer(ii)"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule HI ?", acceptable: ["iodure d'hydrogène", "acide iodhydrique"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule H3PO4 ?", acceptable: ["phosphate d'hydrogène", "acide phosphorique"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule H2SO4 ?", acceptable: ["sulfate d'hydrogène", "acide sulfurique"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule HNO3 ?", acceptable: ["nitrate d'hydrogène", "acide nitrique"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule HCl ?", acceptable: ["chlorure d'hydrogène", "acide chlorhydrique"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule H2CO3 ?", acceptable: ["carbonate d'hydrogène", "acide carbonique"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule H2SO3 ?", acceptable: ["sulfite d'hydrogène", "acide sulfureux"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule HBr ?", acceptable: ["bromure d'hydrogène", "acide bromhydrique"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule KOH ?", acceptable: ["hydroxyde de potassium"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule Mg(OH)2 ?", acceptable: ["hydroxyde de magnésium"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule Al(OH)3 ?", acceptable: ["hydroxyde d'aluminium"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule ZnCl2 ?", acceptable: ["chlorure de zinc"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule AgNO3 ?", acceptable: ["nitrate d'argent"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule SO2 ?", acceptable: ["dioxyde de soufre"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule Na2O ?", acceptable: ["oxyde de sodium"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule FeO ?", acceptable: ["oxyde de fer (ii)", "oxyde de fer ii"], isFormula: false },
             { prompt: "Quelle est la valence du groupement carbonate (CO₃) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
             { prompt: "Quelle est la valence du groupement sulfite (SO₃) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
             { prompt: "Quelle est la valence du groupement phosphate (PO₄) ?", acceptable: ["3", "iii", "valence iii"], isFormula: false },
@@ -435,34 +443,60 @@
             { prompt: "Quelle est la formule générale d'un sel ternaire ?", acceptable: ["MXO"], isFormula: true },
             { prompt: "Quelle est la formule générale d'un oxyde métallique ?", acceptable: ["MO"], isFormula: true },
             { prompt: "Quelle est la formule générale d'un oxyde non-métallique ?", acceptable: ["XO"], isFormula: true },
-            { prompt: "Quel est le nom de la famille d'un acide binaire (ex: HCl) ?", acceptable: ["hydracide", "hydracides"], isFormula: false },
-            { prompt: "Quel est le nom de la famille d'un acide ternaire (ex: H₂SO₄) ?", acceptable: ["oxacide", "oxacides"], isFormula: false },
             { prompt: "Quelle est la valence du groupement hydroxyde (OH)", acceptable: ["1", "i", "valence i"], isFormula: false },
-            { prompt: "Quelle est la valence de l'ion ferreux Fe(II) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
-            { prompt: "Quelle est la valence de l'ion ferrique Fe(III) ?", acceptable: ["3", "iii", "valence iii"], isFormula: false },
+            { prompt: "Quelle est la valence de l'ion fer (II) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
+            { prompt: "Quelle est la valence de l'ion fer (III) ?", acceptable: ["3", "iii", "valence iii"], isFormula: false },
             { prompt: "Quelle est la valence de l'ion cuivre (II) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
-            { prompt: "Le CO₂ fait partie d'une exception. Il est classé dans les corps...", acceptable: ["mineral", "minéral"], isFormula: false },
             { prompt: "Que donne l'équation de synthèse XO + H₂O ?", acceptable: ["HXO", "oxacide"], isFormula: true },
             { prompt: "Que donne l'équation de synthèse MO + H₂O ?", acceptable: ["MOH", "hydroxyde"], isFormula: true }
         ];
 
-        let expertState = { current: null, score: 0, pool: [], index: 0 };
+        let expertState = { 
+            current: null, 
+            score: 0, 
+            totalAnswered: 0, 
+            sessionSize: 20, // 20 questions par session d'auto-évaluation
+            history: [], 
+            pool: [], 
+            index: 0 
+        };
+
+        function resetExpertSession() {
+            expertState.score = 0;
+            expertState.totalAnswered = 0;
+            expertState.history = [];
+            expertState.pool = [...expertPool].sort(() => 0.5 - Math.random());
+            expertState.index = 0;
+            document.getElementById('expert-score').innerText = `Score Session : 0 pts`;
+            loadExpertQuestion();
+        }
 
         function loadExpertQuestion() {
             const container = document.getElementById('expert-container');
+            
+            if (expertState.totalAnswered >= expertState.sessionSize) {
+                showExpertReport();
+                return;
+            }
+
             if (expertState.pool.length === 0 || expertState.index >= expertState.pool.length) {
                 expertState.pool = [...expertPool].sort(() => 0.5 - Math.random());
                 expertState.index = 0;
             }
+
             const item = expertState.pool[expertState.index];
             expertState.index++;
             expertState.current = item;
 
             container.innerHTML = `
                 <div class="space-y-4">
+                    <div class="flex justify-between items-center text-sm font-semibold text-indigo-600">
+                        <span>Question ${expertState.totalAnswered + 1} sur ${expertState.sessionSize}</span>
+                        <span>Score actuel : ${expertState.score} pts</span>
+                    </div>
                     <p class="text-base font-semibold text-gray-800">${item.prompt}</p>
                     <div class="flex gap-2">
-                        <input type="text" id="expert-input" placeholder="Tapez votre réponse ici (ex: Ca(OH)2)" class="flex-grow p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-lg bg-white">
+                        <input type="text" id="expert-input" placeholder="Tapez votre réponse ici..." class="flex-grow p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-lg bg-white">
                         <button onclick="checkExpertAnswer()" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition">Valider</button>
                     </div>
                     <div id="expert-feedback"></div>
@@ -474,7 +508,10 @@
         }
 
         function checkExpertAnswer() {
-            const inputVal = document.getElementById('expert-input').value.trim();
+            const inputField = document.getElementById('expert-input');
+            const inputVal = inputField.value.trim();
+            if (inputVal === "") return;
+
             const item = expertState.current;
             
             let isMatch = false;
@@ -489,16 +526,84 @@
                 });
             }
 
-            const feedbackDiv = document.getElementById('expert-feedback');
-            document.getElementById('expert-input').disabled = true;
+            inputField.disabled = true;
+            expertState.totalAnswered++;
 
             if (isMatch) {
                 expertState.score += 10;
-                feedbackDiv.innerHTML = `<div class="p-4 rounded-lg bg-green-50 border border-green-200 text-green-800 flex justify-between items-center mt-2"><span>✅ <b>Parfait !</b> Bonne réponse.</span><button onclick="loadExpertQuestion()" class="bg-green-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-green-700 transition">Suivant ➔</button></div>`;
-            } else {
-                feedbackDiv.innerHTML = `<div class="p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 flex justify-between items-center mt-2"><span>❌ <b>Incorrect.</b> La réponse exacte attendue était : <b>${item.acceptable[0]}</b></span><button onclick="loadExpertQuestion()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">Suivant ➔</button></div>`;
             }
-            document.getElementById('expert-score').innerText = `Score Expert : ${expertState.score} pts`;
+
+            expertState.history.push({
+                prompt: item.prompt,
+                userAnswer: inputVal,
+                expected: item.acceptable[0],
+                isCorrect: isMatch
+            });
+
+            document.getElementById('expert-score').innerText = `Score Session : ${expertState.score} pts`;
+
+            const feedbackDiv = document.getElementById('expert-feedback');
+            const isLast = expertState.totalAnswered >= expertState.sessionSize;
+
+            if (isMatch) {
+                feedbackDiv.innerHTML = `<div class="p-4 rounded-lg bg-green-50 border border-green-200 text-green-800 flex justify-between items-center mt-2"><span>✅ <b>Parfait !</b> Bonne réponse.</span><button onclick="loadExpertQuestion()" class="bg-green-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-green-700 transition">${isLast ? 'Voir mon rapport ➔' : 'Suivant ➔'}</button></div>`;
+            } else {
+                feedbackDiv.innerHTML = `<div class="p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 flex justify-between items-center mt-2"><span>❌ <b>Incorrect.</b> Attendue : <b>${item.acceptable[0]}</b></span><button onclick="loadExpertQuestion()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">${isLast ? 'Voir mon rapport ➔' : 'Suivant ➔'}</button></div>`;
+            }
+        }
+
+        function showExpertReport() {
+            const container = document.getElementById('expert-container');
+            const maxScore = expertState.sessionSize * 10;
+            const percentage = Math.round((expertState.score / maxScore) * 100);
+            
+            let html = `
+                <div class="space-y-6">
+                    <div class="text-center bg-indigo-50 p-6 rounded-xl border border-indigo-100 space-y-2">
+                        <h3 class="text-2xl font-bold text-indigo-900">📊 Rapport d'Auto-évaluation - Mode Expert</h3>
+                        <p class="text-lg text-gray-700">Note obtenue : <span class="font-extrabold text-indigo-600">${expertState.score} / ${maxScore}</span> (${percentage}%)</p>
+                    </div>
+
+                    <div class="overflow-x-auto border rounded-lg bg-white shadow-sm max-h-96 overflow-y-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-gray-100 border-b text-gray-700 sticky top-0">
+                                    <th class="p-3">Question</th>
+                                    <th class="p-3">Votre réponse</th>
+                                    <th class="p-3">Réponse attendue</th>
+                                    <th class="p-3 text-center">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+            expertState.history.forEach((h, idx) => {
+                const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
+                const statusBadge = h.isCorrect 
+                    ? `<span class="bg-green-100 text-green-800 px-2.5 py-1 rounded-full font-medium text-xs">Correct</span>`
+                    : `<span class="bg-red-100 text-red-800 px-2.5 py-1 rounded-full font-medium text-xs">Incorrect</span>`;
+                
+                html += `
+                    <tr class="${rowBg} border-b">
+                        <td class="p-3 font-medium text-gray-800">${h.prompt}</td>
+                        <td class="p-3 font-mono text-indigo-700">${h.userAnswer ? h.userAnswer : '<i>(Aucune)</i>'}</td>
+                        <td class="p-3 font-mono text-gray-600">${h.expected}</td>
+                        <td class="p-3 text-center">${statusBadge}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-center">
+                        <button onclick="resetExpertSession()" class="bg-indigo-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-indigo-700 transition shadow-md">🔄 Démarrer une nouvelle session de 20 questions</button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
         }
 
         // Lancement initial de l'arbre
