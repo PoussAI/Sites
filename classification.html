@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprentissage de la Classification & Nomenclature Chimique</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        sub {
+            font-size: 0.75em;
+            vertical-align: sub;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
+
+    <!-- En-tête -->
+    <header class="bg-indigo-600 text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <span>🧪</span> Assistant Chimie : Classification & Nomenclature
+            </h1>
+            <p class="text-indigo-200 text-sm">Outil pédagogique interactif (90 questions expert)</p>
+        </div>
+    </header>
+
+    <!-- Barre de Navigation -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-6xl mx-auto flex space-x-2 px-4 py-2 overflow-x-auto">
+            <button onclick="switchTab('guide')" id="nav-guide" class="px-4 py-2 font-medium rounded-lg text-indigo-600 bg-indigo-50 transition whitespace-nowrap">🧭 Guide Interactif</button>
+            <button onclick="switchTab('quiz')" id="nav-quiz" class="px-4 py-2 font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">✍️ Quiz QCM (24 q.)</button>
+            <button onclick="switchTab('atelier')" id="nav-atelier" class="px-4 py-2 font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">🧪 Atelier (36 m.)</button>
+            <button onclick="switchTab('expert')" id="nav-expert" class="px-4 py-2 font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">⌨️ Mode Expert (90 q.)</button>
+            <button onclick="switchTab('memo')" id="nav-memo" class="px-4 py-2 font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">📖 Aide-mémoire</button>
+        </div>
+    </div>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full">
+        
+        <!-- ONGLET 1 : GUIDE INTERACTIF -->
+        <div id="tab-guide" class="space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <h2 class="text-xl font-bold text-indigo-700 mb-2">🧭 Assistant de Classification Étape par Étape</h2>
+                <p class="text-gray-600 mb-6">Répondez aux questions pour suivre pas à pas le chemin logique du diagramme et classifier votre substance.</p>
+                <div id="wizard-container" class="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100"></div>
+            </div>
+        </div>
+
+        <!-- ONGLET 2 : QUIZ QCM -->
+        <div id="tab-quiz" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-indigo-700">✍️ Quiz de Classification Aléatoire</h2>
+                    <span id="score-display" class="font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">Score : 0 / 0</span>
+                </div>
+                <div id="quiz-container"></div>
+            </div>
+        </div>
+
+        <!-- ONGLET 3 : ATELIER CHOIX MULTIPLE -->
+        <div id="tab-atelier" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-indigo-700">🧪 Atelier QCM : Noms et Formules</h2>
+                        <p class="text-gray-600 text-sm">Associez chaque formule chimique à son nom parmi 36 molécules de référence.</p>
+                    </div>
+                    <span id="atelier-score" class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-4 py-1.5 rounded-full">Série : 0 réussie(s)</span>
+                </div>
+                <div id="atelier-container" class="bg-slate-50 p-6 rounded-xl border"></div>
+            </div>
+        </div>
+
+        <!-- ONGLET 4 : MODE EXPERT (90 QUESTIONS) -->
+        <div id="tab-expert" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-indigo-700">⌨️ Mode Expert : Saisie Libre (90 questions)</h2>
+                        <p class="text-gray-600 text-sm">Tapez la réponse attendue. <b>Attention aux majuscules/minuscules</b> pour les formules chimiques (ex : <code class="bg-gray-100 px-1 py-0.5 rounded text-indigo-600">Ca(OH)2</code>).</p>
+                    </div>
+                    <span id="expert-score" class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-4 py-1.5 rounded-full">Score Expert : 0 pts</span>
+                </div>
+                <div id="expert-container" class="bg-slate-50 p-6 rounded-xl border space-y-4"></div>
+            </div>
+        </div>
+
+        <!-- ONGLET 5 : AIDE-MEMOIRE -->
+        <div id="tab-memo" class="hidden space-y-6">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border">
+                    <h3 class="text-lg font-bold text-indigo-700 mb-4 border-b pb-2">⚡ Valences des Groupements & Métaux</h3>
+                    <ul class="space-y-3">
+                        <li class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-semibold text-gray-700">Valence I</span><span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded text-sm font-medium">OH⁻, NO₃⁻, Na⁺, K⁺</span></li>
+                        <li class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-semibold text-gray-700">Valence II</span><span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded text-sm font-medium">SO₄²⁻, CO₃²⁻, Ca²⁺, Fe²⁺, Cu²⁺</span></li>
+                        <li class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-semibold text-gray-700">Valence III</span><span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded text-sm font-medium">PO₄³⁻, Al³⁺, Fe³⁺</span></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border">
+                    <h3 class="text-lg font-bold text-indigo-700 mb-4 border-b pb-2">🔢 Préfixes (nO / nX) pour Oxydes</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-medium text-sm">1/2</span> <span class="text-indigo-600 font-bold">hémi</span></div>
+                        <div class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-medium text-sm">1</span> <span class="text-indigo-600 font-bold">mono</span></div>
+                        <div class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-medium text-sm">3/2</span> <span class="text-indigo-600 font-bold">hémitri</span></div>
+                        <div class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-medium text-sm">2</span> <span class="text-indigo-600 font-bold">di</span></div>
+                        <div class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-medium text-sm">5/2</span> <span class="text-indigo-600 font-bold">hémipent</span></div>
+                        <div class="bg-gray-50 p-3 rounded-lg border flex justify-between items-center"><span class="font-medium text-sm">3</span> <span class="text-indigo-600 font-bold">tri</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="bg-white border-t mt-12 py-4 text-center text-sm text-gray-500">
+        Application pédagogique de chimie - Fichier HTML unique
+    </footer>
+
+    <!-- Script JavaScript -->
+    <script>
+        function formatChem(str) {
+            if (!str) return "";
+            return str.replace(/([A-Za-z\)])(\d+)/g, '$1<sub>$2</sub>');
+        }
+
+        function switchTab(tabName) {
+            ['guide', 'quiz', 'atelier', 'expert', 'memo'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).classList.remove('text-indigo-600', 'bg-indigo-50');
+                document.getElementById(`nav-${t}`).classList.add('text-gray-600', 'hover:bg-gray-100');
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).classList.remove('text-gray-600', 'hover:bg-gray-100');
+            document.getElementById(`nav-${tabName}`).classList.add('text-indigo-600', 'bg-indigo-50');
+            
+            if(tabName === 'quiz' && quizState.currentQuestion === 0 && !quizState.started) {
+                initDynamicQuiz();
+            }
+            if(tabName === 'atelier' && atelierState.pool.length === 0) {
+                loadAtelierQuestion();
+            }
+            if(tabName === 'expert' && expertState.pool.length === 0) {
+                loadExpertQuestion();
+            }
+        }
+
+        // --- 1. GUIDE INTERACTIF ---
+        const wizardSteps = {
+            start: { question: "Combien de constituants possède la substance à classer ?", options: [{ text: "Plusieurs constituants", next: "melange" }, { text: "1 seul constituant", next: "corps_pur" }] },
+            melange: { result: "🧪 C'est un <b>Mélange</b>." },
+            corps_pur: { question: "Quels types d'atomes constituent ce corps pur ?", options: [{ text: "Atomes identiques", next: "corps_simple" }, { text: "Atomes différents", next: "corps_compose" }] },
+            corps_simple: { question: "Où se situe l'élément dans le tableau périodique ?", options: [{ text: "À gauche (en bleu) ➔ Donneurs d'ions", result: "⚡ <b>Corps Métallique M</b>" }, { text: "À droite (en rose) ➔ Receveurs d'ions", result: "⚛️ <b>Corps non-métallique X</b>" }] },
+            corps_compose: { question: "Y a-t-il présence de Carbone (sauf CO₂) ?", options: [{ text: "Présence de Carbone", result: "🌿 <b>Corps Organique</b>" }, { text: "Absence de Carbone (ou exception CO₂)", next: "corps_mineral" }] },
+            corps_mineral: { question: "Quelles sont les propriétés de ce corps minéral ?", options: [
+                { text: "Tournesol rouge (+), réagit avec les métaux (+), électricité (+)", next: "acide" },
+                { text: "Tournesol bleu (+), pas de réaction métaux (-), électricité (+)", result: "🧪 <b>Hydroxyde (MOH)</b>" },
+                { text: "Tournesol neutre (-), pas de réaction métaux (-), électricité (+)", next: "sel" },
+                { text: "Oxyde (contient de l'Oxygène O)", next: "oxyde" }
+            ]},
+            acide: { question: "De quel type d'acide s'agit-il ?", options: [{ text: "Acide binaire (HX)", result: "⚗️ <b>Hydracide (HX)</b>" }, { text: "Acide ternaire (HXO)", result: "⚗️ <b>Oxacide (HXO)</b>" }] },
+            sel: { question: "De quel type de sel s'agit-il ?", options: [{ text: "Sel binaire (MX)", result: "🧂 <b>Sel binaire (MX)</b>" }, { text: "Sel ternaire (MXO)", result: "🧂 <b>Sel ternaire (MXO)</b>" }] },
+            oxyde: { question: "L'oxyde est-il formé avec un métal ou un non-métal ?", options: [{ text: "Avec un métal M", result: "🧱 <b>Oxyde métallique (MO)</b>" }, { text: "Avec un non-métal X", result: "💨 <b>Oxyde non-métallique (XO)</b>" }] }
+        };
+
+        function renderWizard(stepKey) {
+            const container = document.getElementById('wizard-container');
+            const step = wizardSteps[stepKey];
+            if (step.result) {
+                container.innerHTML = `<div class="text-center space-y-4 py-4"><div class="text-2xl font-bold text-indigo-800">${step.result}</div><button onclick="renderWizard('start')" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">🔄 Recommencer</button></div>`;
+                return;
+            }
+            let html = `<h3 class="text-lg font-semibold text-gray-800 mb-4">${step.question}</h3><div class="space-y-3">`;
+            step.options.forEach(opt => {
+                const action = opt.next ? `onclick="renderWizard('${opt.next}')"` : `onclick="showWizardResult('${encodeURIComponent(opt.result)}')";`;
+                html += `<button ${action} class="w-full text-left p-3 rounded-lg border bg-white hover:bg-indigo-50 transition font-medium text-gray-700 shadow-sm flex items-center justify-between"><span>${opt.text}</span><span class="text-indigo-500 font-bold">➔</span></button>`;
+            });
+            if (stepKey !== 'start') html += `<button onclick="renderWizard('start')" class="mt-6 text-sm text-indigo-600 hover:underline font-medium">⬅️ Revenir au début</button>`;
+            container.innerHTML = html + `</div>`;
+        }
+        function showWizardResult(res) {
+            document.getElementById('wizard-container').innerHTML = `<div class="text-center space-y-4 py-4"><div class="text-2xl font-bold text-indigo-800">${decodeURIComponent(res)}</div><button onclick="renderWizard('start')" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">🔄 Recommencer</button></div>`;
+        }
+
+        // --- 2. QUIZ QCM ---
+        const masterQuizPool = [
+            { question: "Un corps pur dont les atomes sont identiques et situé à gauche de l'escalier (en bleu) est un...", options: ["Corps non-métallique X", "Corps métallique M", "Corps organique", "Sel binaire"], correct: 1, explanation: "À gauche de l'escalier, ce sont les donneurs d'ions : les métaux M." },
+            { question: "Quel est le comportement d'un acide face au papier tournesol ?", options: ["Il le fait virer au bleu", "Il le fait virer au rouge", "Aucun effet", "Il le décolore"], correct: 1, explanation: "L'acide fait virer le tournesol au rouge." },
+            { question: "Un corps pur composé contenant du Carbone (sauf CO₂) est classé comme...", options: ["Corps minéral", "Corps organique", "Hydracide", "Sel ternaire"], correct: 1, explanation: "La présence de carbone définit un corps organique." },
+            { question: "Quelle est la formule générale d'un sel binaire ?", options: ["HX", "MOH", "MX", "MO"], correct: 2, explanation: "Sel binaire = MX." },
+            { question: "Quelle est la valence du groupement Phosphate (PO₄) ?", options: ["Valence I", "Valence II", "Valence III", "Valence IV"], correct: 2, explanation: "Le phosphate PO₄ a une valence III." },
+            { question: "Quelle est la nature d'une solution de sel face au test de conduction de l'électricité ?", options: ["Elle ne conduit pas l'électricité", "Elle conduit l'électricité (+)", "Elle produit du carbone", "Elle devient un mélange homogène"], correct: 1, explanation: "Les sels conduisent l'électricité dans le diagramme." },
+            { question: "Comment appelle-t-on un acide binaire de formule HX ?", options: ["Oxacide", "Hydracide", "Hydroxyde", "Oxyde"], correct: 1, explanation: "HX est un hydracide." },
+            { question: "Quel préfixe correspond à un rapport nO/nX de 2 pour un oxyde non-métallique ?", options: ["mono", "di", "tri", "hémi"], correct: 1, explanation: "2 correspond au préfixe 'di'." },
+            { question: "Quelle est la formule générale d'un oxacide (acide ternaire) ?", options: ["HX", "HXO", "MOH", "MX"], correct: 1, explanation: "Un oxacide (acide ternaire) a pour formule HXO." },
+            { question: "Quelle est la formule générale d'un sel ternaire ?", options: ["MX", "MXO", "MO", "XO"], correct: 1, explanation: "Un sel ternaire a pour formule MXO." },
+            { question: "Quel est le comportement d'un hydroxyde face au papier tournesol ?", options: ["Il le fait virer au rouge", "Il le fait virer au bleu", "Aucun effet", "Il le rend vert"], correct: 1, explanation: "L'hydroxyde fait virer le tournesol au bleu." },
+            { question: "D'après le diagramme, est-ce qu'un hydroxyde réagit avec les métaux ?", options: ["Oui (+)", "Non (-)", "Uniquement à chaud", "Seulement avec le fer"], correct: 1, explanation: "La case indique une réaction négative (-) avec les métaux pour les hydroxydes." },
+            { question: "Quel est le produit de la réaction entre un acide et un métal ?", options: ["Sel + Hydrogène (H₂)", "Hydroxyde + Eau", "Oxyde + Dioxygène", "Un mélange hétérogène"], correct: 0, explanation: "Acide + Métal donne un Sel + H₂." },
+            { question: "Quelle est l'équation de synthèse d'un oxacide à partir de son oxyde ?", options: ["XO + H₂O ➔ HXO", "X + O₂ ➔ MOH", "MO + H₂O ➔ HX", "HX + MOH ➔ H₂O"], correct: 0, explanation: "Synthèse de l'oxacide : XO + H₂O ➔ HXO." },
+            { question: "Quelle est l'équation de synthèse d'un hydroxyde à partir de son oxyde ?", options: ["MO + H₂O ➔ MOH", "XO + H₂O ➔ HXO", "M + H₂ ➔ MO", "HX + M ➔ MX"], correct: 0, explanation: "Synthèse de l'hydroxyde : MO + H₂O ➔ MOH." },
+            { question: "Quel préfixe utilise-t-on pour un rapport nO/nX de 1/2 dans un oxyde non-métallique ?", options: ["hémi", "mono", "di", "tri"], correct: 0, explanation: "1/2 correspond au préfixe 'hémi'." },
+            { question: "Quel préfixe utilise-t-on pour un rapport nO/nX de 3 dans un oxyde non-métallique ?", options: ["di", "tri", "hémi", "mono"], correct: 1, explanation: "3 correspond au préfixe 'tri'." },
+            { question: "Quelle est la valence des groupements Hydroxyde (OH) et Nitrate (NO₃) ?", options: ["Valence I", "Valence II", "Valence III", "Valence IV"], correct: 0, explanation: "OH et NO₃ ont une valence I." },
+            { question: "Quelle est la valence des groupements Sulfate (SO₄), Carbonate (CO₃) et Sulfite (SO₃) ?", options: ["Valence I", "Valence II", "Valence III", "Valence IV"], correct: 1, explanation: "SO₄, CO₃ et SO₃ ont une valence II." },
+            { question: "Comment qualifie-t-on un corps pur simple situé à droite de l'escalier du tableau périodique (en rose) ?", options: ["Corps métallique M", "Corps non-métallique X", "Corps organique", "Sel binaire"], correct: 1, explanation: "À droite, ce sont les receveurs d'ions : Corps non-métallique X." },
+            { question: "Le dioxyde de carbone ($CO_2$) est-il organique ou minéral ?", options: ["Organique", "Minéral (exception)", "C'est un sel", "C'est un hydracide"], correct: 1, explanation: "Bien qu'il contienne du carbone, le CO₂ est l'exception explicitement classée dans les corps minéraux." },
+            { question: "Comment appelle-t-on la réaction entre un acide et un hydroxyde ?", options: ["Une neutralisation", "Une oxydation", "Une réduction", "Une combustion"], correct: 0, explanation: "L'action d'un acide sur un hydroxyde est une réaction de neutralisation." },
+            { question: "Quel préfixe correspond à un rapport de 3/2 (nO/nX) dans un oxyde ?", options: ["hémi", "hémitri", "hémipent", "tri"], correct: 1, explanation: "3/2 correspond au préfixe 'hémitri'." },
+            { question: "Quel préfixe correspond à un rapport de 5/2 (nO/nX) dans un oxyde ?", options: ["hémipent", "hémitri", "di", "tri"], correct: 0, explanation: "5/2 correspond au préfixe 'hémipent'." }
+        ];
+
+        let quizState = { currentQuestion: 0, score: 0, answered: false, started: false, questions: [] };
+
+        function initDynamicQuiz() {
+            quizState.started = true;
+            quizState.currentQuestion = 0;
+            quizState.score = 0;
+            quizState.questions = [...masterQuizPool].sort(() => 0.5 - Math.random()).slice(0, 5);
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            const container = document.getElementById('quiz-container');
+            if (quizState.currentQuestion >= quizState.questions.length) {
+                container.innerHTML = `<div class="text-center space-y-4 py-8"><h3 class="text-2xl font-bold text-indigo-800">🎉 Quiz terminé !</h3><p class="text-lg text-gray-700">Score : <span class="font-bold text-indigo-600">${quizState.score} / ${quizState.questions.length}</span></p><button onclick="initDynamicQuiz()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">🔄 Recommencer</button></div>`;
+                return;
+            }
+            const q = quizState.questions[quizState.currentQuestion];
+            quizState.answered = false;
+            let html = `<div class="mb-4 text-sm font-medium text-indigo-600">Question ${quizState.currentQuestion + 1} / ${quizState.questions.length}</div><h3 class="text-lg font-semibold text-gray-800 mb-4">${q.question}</h3><div class="space-y-3 mb-6">`;
+            q.options.forEach((opt, idx) => {
+                html += `<button onclick="selectQuizAnswer(${idx})" id="quiz-opt-${idx}" class="w-full text-left p-3 rounded-lg border bg-white hover:bg-indigo-50 transition font-medium text-gray-700 shadow-sm">${opt}</button>`;
+            });
+            html += `</div><div id="quiz-feedback" class="hidden"></div>`;
+            container.innerHTML = html;
+        }
+
+        function selectQuizAnswer(selectedIdx) {
+            if (quizState.answered) return;
+            quizState.answered = true;
+            const q = quizState.questions[quizState.currentQuestion];
+            const feedbackDiv = document.getElementById('quiz-feedback');
+            for (let i = 0; i < q.options.length; i++) {
+                const btn = document.getElementById(`quiz-opt-${i}`);
+                btn.disabled = true;
+                if (i === q.correct) btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                else if (i === selectedIdx) btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+            }
+            if (selectedIdx === q.correct) {
+                quizState.score++;
+                document.getElementById('score-display').innerText = `Score : ${quizState.score} / ${quizState.questions.length}`;
+            }
+            feedbackDiv.classList.remove('hidden');
+            feedbackDiv.innerHTML = `<div class="p-4 rounded-lg ${selectedIdx === q.correct ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'} mb-4"><p class="font-bold mb-1">${selectedIdx === q.correct ? '✅ Correct !' : '❌ Incorrect.'}</p><p class="text-sm">${q.explanation}</p></div><button onclick="quizState.currentQuestion++; loadQuizQuestion();" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">Question suivante ➔</button>`;
+        }
+
+
+        // --- 3. ATELIER CHOIX MULTIPLE ---
+        const nomenclaturePool = [
+            { formula: "HCl", name: "chlorure d'hydrogène (acide chlorhydrique)" },
+            { formula: "HBr", name: "bromure d'hydrogène" },
+            { formula: "HI", name: "iodure d'hydrogène" },
+            { formula: "H2SO4", name: "sulfate d'hydrogène (acide sulfurique)" },
+            { formula: "HNO3", name: "nitrate d'hydrogène (acide nitrique)" },
+            { formula: "H3PO4", name: "phosphate d'hydrogène (acide phosphorique)" },
+            { formula: "H2CO3", name: "carbonate d'hydrogène (acide carbonique)" },
+            { formula: "H2SO3", name: "sulfite d'hydrogène (acide sulfureux)" },
+            { formula: "NaOH", name: "hydroxyde de sodium" },
+            { formula: "KOH", name: "hydroxyde de potassium" },
+            { formula: "Ca(OH)2", name: "hydroxyde de calcium" },
+            { formula: "Mg(OH)2", name: "hydroxyde de magnésium" },
+            { formula: "Al(OH)3", name: "hydroxyde d'aluminium" },
+            { formula: "Fe(OH)2", name: "hydroxyde de fer (II)" },
+            { formula: "Fe(OH)3", name: "hydroxyde de fer (III)" },
+            { formula: "Cu(OH)2", name: "hydroxyde de cuivre (II)" },
+            { formula: "Zn(OH)2", name: "hydroxyde de zinc" },
+            { formula: "AgOH", name: "hydroxyde d'argent" },
+            { formula: "NaCl", name: "chlorure de sodium" },
+            { formula: "CaS", name: "sulfure de calcium" },
+            { formula: "FeCl3", name: "chlorure de fer (III)" },
+            { formula: "ZnCl2", name: "chlorure de zinc" },
+            { formula: "CuSO4", name: "sulfate de cuivre (II)" },
+            { formula: "Na2SO4", name: "sulfate de sodium" },
+            { formula: "CaCO3", name: "carbonate de calcium" },
+            { formula: "MgCO3", name: "carbonate de magnésium" },
+            { formula: "KNO3", name: "nitrate de potassium" },
+            { formula: "Ca3(PO4)2", name: "phosphate de calcium" },
+            { formula: "CO2", name: "dioxyde de carbone" },
+            { formula: "SO3", name: "trioxyde de soufre" },
+            { formula: "SO2", name: "dioxyde de soufre" },
+            { formula: "NO2", name: "dioxyde d'azote" },
+            { formula: "CaO", name: "oxyde de calcium" },
+            { formula: "Na2O", name: "oxyde de sodium" },
+            { formula: "FeO", name: "oxyde de fer (II)" },
+            { formula: "Fe2O3", name: "oxyde de fer (III)" }
+        ];
+
+        let atelierState = { current: null, streak: 0, pool: [], index: 0 };
+
+        function loadAtelierQuestion() {
+            const container = document.getElementById('atelier-container');
+            if (atelierState.pool.length === 0 || atelierState.index >= atelierState.pool.length) {
+                atelierState.pool = [...nomenclaturePool].sort(() => 0.5 - Math.random());
+                atelierState.index = 0;
+            }
+            const item = atelierState.pool[atelierState.index];
+            atelierState.index++;
+
+            const mode = Math.random() > 0.5 ? 'formulaToName' : 'nameToFormula';
+            let distractors = nomenclaturePool.filter(i => i.name !== item.name);
+            distractors.sort(() => 0.5 - Math.random());
+            let choices = distractors.slice(0, 3);
+            choices.push(item);
+            choices.sort(() => 0.5 - Math.random());
+            atelierState.current = { item, mode, choices };
+
+            let html = `<div class="space-y-4">`;
+            if (mode === 'formulaToName') {
+                html += `<p class="text-sm font-semibold text-indigo-600">Trouvez le nom correct pour la formule :</p><div class="text-3xl font-mono text-gray-900 bg-white p-4 rounded-lg border text-center shadow-inner my-2">${formatChem(item.formula)}</div>`;
+            } else {
+                html += `<p class="text-sm font-semibold text-indigo-600">Trouvez la formule chimique correcte pour :</p><div class="text-2xl font-bold text-gray-900 bg-white p-4 rounded-lg border text-center shadow-inner my-2">${item.name}</div>`;
+            }
+            html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">`;
+            choices.forEach((choice) => {
+                const displayText = mode === 'formulaToName' ? choice.name : formatChem(choice.formula);
+                const isCorrect = choice.name === item.name;
+                html += `<button onclick="checkAtelierAnswer(${isCorrect}, this)" class="atelier-btn text-left p-3.5 rounded-lg border bg-white hover:bg-indigo-50 font-medium text-gray-700 shadow-sm transition">${displayText}</button>`;
+            });
+            html += `</div><div id="atelier-feedback" class="mt-4"></div></div>`;
+            container.innerHTML = html;
+        }
+
+        function checkAtelierAnswer(isCorrect, btnElement) {
+            document.querySelectorAll('.atelier-btn').forEach(b => b.disabled = true);
+            const feedbackDiv = document.getElementById('atelier-feedback');
+            const currentItem = atelierState.current.item;
+
+            if (isCorrect) {
+                atelierState.streak++;
+                btnElement.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                feedbackDiv.innerHTML = `<div class="p-4 rounded-lg bg-green-50 border border-green-200 text-green-800 flex justify-between items-center"><span>✅ Correct ! <b>${formatChem(currentItem.formula)}</b> = <i>${currentItem.name}</i></span><button onclick="loadAtelierQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg">Suivant ➔</button></div>`;
+            } else {
+                atelierState.streak = 0;
+                btnElement.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                feedbackDiv.innerHTML = `<div class="p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 flex justify-between items-center"><span>❌ Erreur. La bonne réponse était : <b>${formatChem(currentItem.formula)}</b> (${currentItem.name})</span><button onclick="loadAtelierQuestion()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg">Suivant ➔</button></div>`;
+            }
+            document.getElementById('atelier-score').innerText = `Série : ${atelierState.streak} réussie(s)`;
+        }
+
+
+        // --- 4. MODE EXPERT (90 questions au total) ---
+        const expertPool = [
+            { prompt: "Écrivez la formule de l'hydroxyde de calcium", acceptable: ["Ca(OH)2"], isFormula: true },
+            { prompt: "Écrivez la formule de l'acide sulfurique", acceptable: ["H2SO4"], isFormula: true },
+            { prompt: "Écrivez la formule de l'hydroxyde de sodium", acceptable: ["NaOH"], isFormula: true },
+            { prompt: "Écrivez la formule du dioxyde de carbone", acceptable: ["CO2"], isFormula: true },
+            { prompt: "Écrivez la formule du chlorure de sodium (sel)", acceptable: ["NaCl"], isFormula: true },
+            { prompt: "Écrivez la formule de l'oxyde de fer (III)", acceptable: ["Fe2O3"], isFormula: true },
+            { prompt: "Écrivez la formule du sulfate de cuivre (II)", acceptable: ["CuSO4"], isFormula: true },
+            { prompt: "Écrivez la formule de l'hydroxyde de fer (III)", acceptable: ["Fe(OH)3"], isFormula: true },
+            { prompt: "Quel est le nom de la famille d'un corps pur minéral faisant virer le tournesol au bleu (et conduisant l'électricité) ?", acceptable: ["hydroxyde", "base"], isFormula: false },
+            { prompt: "Quel préfixe utilise-t-on pour un rapport stœchiométrique de 1/2 dans un oxyde non-métallique ?", acceptable: ["hémi", "hemi"], isFormula: false },
+            { prompt: "Écrivez la formule de l'acide chlorhydrique (chlorure d'hydrogène)", acceptable: ["HCl"], isFormula: true },
+            { prompt: "Écrivez la formule de l'acide nitrique (nitrate d'hydrogène)", acceptable: ["HNO3"], isFormula: true },
+            { prompt: "Écrivez la formule de l'hydroxyde de potassium", acceptable: ["KOH"], isFormula: true },
+            { prompt: "Écrivez la formule du carbonate de calcium", acceptable: ["CaCO3"], isFormula: true },
+            { prompt: "Écrivez la formule du chlorure de fer (III)", acceptable: ["FeCl3"], isFormula: true },
+            { prompt: "Écrivez la formule du phosphate de calcium", acceptable: ["Ca3(PO4)2"], isFormula: true },
+            { prompt: "Écrivez la formule du trioxyde de soufre", acceptable: ["SO3"], isFormula: true },
+            { prompt: "Écrivez la formule de l'oxyde de calcium", acceptable: ["CaO"], isFormula: true },
+            { prompt: "Écrivez la formule de l'hydroxyde de fer (II)", acceptable: ["Fe(OH)2"], isFormula: true },
+            { prompt: "Écrivez la formule du bromure d'hydrogène", acceptable: ["HBr"], isFormula: true },
+            { prompt: "Quel est le nom de la famille d'un corps pur minéral faisant virer le tournesol au rouge et réagissant avec les métaux ?", acceptable: ["acide", "acides"], isFormula: false },
+            { prompt: "Quel est le nom de la famille d'un corps pur dont la formule générale est MX ?", acceptable: ["sel binaire", "selbinaire"], isFormula: false },
+            { prompt: "Quel est le nom de la famille d'un corps pur dont la formule générale est MXO ?", acceptable: ["sel ternaire", "selternaire"], isFormula: false },
+            { prompt: "Quel préfixe utilise-t-on pour un rapport de 1 (nO/nX) dans un oxyde ?", acceptable: ["mono"], isFormula: false },
+            { prompt: "Quel préfixe utilise-t-on pour un rapport de 2 (nO/nX) dans un oxyde ?", acceptable: ["di"], isFormula: false },
+            { prompt: "Quel préfixe utilise-t-on pour un rapport de 3 (nO/nX) dans un oxyde ?", acceptable: ["tri"], isFormula: false },
+            { prompt: "Quel préfixe utilise-t-on pour un rapport de 3/2 (nO/nX) dans un oxyde ?", acceptable: ["hémitri", "hemitri"], isFormula: false },
+            { prompt: "Quel préfixe utilise-t-on pour un rapport de 5/2 (nO/nX) dans un oxyde ?", acceptable: ["hémipent", "hemipent"], isFormula: false },
+            { prompt: "Quelle est la valence du groupement nitrate (NO₃) ?", acceptable: ["1", "i", "valence i"], isFormula: false },
+            { prompt: "Quelle est la valence du groupement sulfate (SO₄) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
+            // 60 questions supplémentaires pour tripler à nouveau le mode expert
+            { prompt: "Écrivez la formule de l'acide phosphorique", acceptable: ["H3PO4"], isFormula: true },
+            { prompt: "Écrivez la formule de l'acide carbonique", acceptable: ["H2CO3"], isFormula: true },
+            { prompt: "Écrivez la formule de l'acide sulfureux", acceptable: ["H2SO3"], isFormula: true },
+            { prompt: "Écrivez la formule de l'acide iodhydrique", acceptable: ["HI"], isFormula: true },
+            { prompt: "Écrivez la formule de l'hydroxyde de magnésium", acceptable: ["Mg(OH)2"], isFormula: true },
+            { prompt: "Écrivez la formule de l'hydroxyde d'aluminium", acceptable: ["Al(OH)3"], isFormula: true },
+            { prompt: "Écrivez la formule de l'hydroxyde de zinc", acceptable: ["Zn(OH)2"], isFormula: true },
+            { prompt: "Écrivez la formule de l'hydroxyde d'argent", acceptable: ["AgOH"], isFormula: true },
+            { prompt: "Écrivez la formule du sulfate de sodium", acceptable: ["Na2SO4"], isFormula: true },
+            { prompt: "Écrivez la formule du carbonate de magnésium", acceptable: ["MgCO3"], isFormula: true },
+            { prompt: "Écrivez la formule du chlorure de zinc", acceptable: ["ZnCl2"], isFormula: true },
+            { prompt: "Écrivez la formule du nitrate d'argent", acceptable: ["AgNO3"], isFormula: true },
+            { prompt: "Écrivez la formule du dioxyde de soufre", acceptable: ["SO2"], isFormula: true },
+            { prompt: "Écrivez la formule du dioxyde d'azote", acceptable: ["NO2"], isFormula: true },
+            { prompt: "Écrivez la formule de l'oxyde de sodium", acceptable: ["Na2O"], isFormula: true },
+            { prompt: "Écrivez la formule de l'oxyde d'aluminium", acceptable: ["Al2O3"], isFormula: true },
+            { prompt: "Écrivez la formule du sulfure de calcium", acceptable: ["CaS"], isFormula: true },
+            { prompt: "Écrivez la formule du nitrate de potassium", acceptable: ["KNO3"], isFormula: true },
+            { prompt: "Écrivez la formule de l'oxyde de fer (II)", acceptable: ["FeO"], isFormula: true },
+            { prompt: "Écrivez la formule du phosphate de calcium", acceptable: ["Ca3(PO4)2"], isFormula: true },
+            { prompt: "Quel est le nom exact associé à la formule HI ?", acceptable: ["iodure d'hydrogene", "ioduredhydrogene"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule H3PO4 ?", acceptable: ["phosphate d'hydrogene", "phosphatedhydrogene"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule KOH ?", acceptable: ["hydroxyde de potassium", "hydroxydedepotassium"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule Mg(OH)2 ?", acceptable: ["hydroxyde de magnesium", "hydroxydedemagnesium"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule Al(OH)3 ?", acceptable: ["hydroxyde d'aluminium", "hydroxydedaluminium"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule ZnCl2 ?", acceptable: ["chlorure de zinc", "chloruredezinc"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule AgNO3 ?", acceptable: ["nitrate d'argent", "nitratedargent"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule SO2 ?", acceptable: ["dioxyde de soufre", "dioxydedesoufre"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule Na2O ?", acceptable: ["oxyde de sodium", "oxydedesodium"], isFormula: false },
+            { prompt: "Quel est le nom exact associé à la formule FeO ?", acceptable: ["oxyde de fer ii", "oxydedeferii", "oxyde de fer(ii)"], isFormula: false },
+            { prompt: "Quelle est la valence du groupement carbonate (CO₃) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
+            { prompt: "Quelle est la valence du groupement sulfite (SO₃) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
+            { prompt: "Quelle est la valence du groupement phosphate (PO₄) ?", acceptable: ["3", "iii", "valence iii"], isFormula: false },
+            { prompt: "Quelle est la valence de l'ion sodium (Na)", acceptable: ["1", "i", "valence i"], isFormula: false },
+            { prompt: "Quelle est la valence de l'ion calcium (Ca)", acceptable: ["2", "ii", "valence ii"], isFormula: false },
+            { prompt: "Quelle est la valence de l'ion aluminium (Al)", acceptable: ["3", "iii", "valence iii"], isFormula: false },
+            { prompt: "Comment qualifie-t-on un corps pur avec des atomes différents et sans carbone (sauf CO₂) ?", acceptable: ["mineral", "corps mineral"], isFormula: false },
+            { prompt: "Comment qualifie-t-on un corps pur avec des atomes différents et avec du carbone ?", acceptable: ["organique", "corps organique"], isFormula: false },
+            { prompt: "Comment appelle-t-on un corps pur simple avec des atomes identiques situé à droite de l'escalier ?", acceptable: ["corps non-metallique", "corps non metallique", "non-metallique"], isFormula: false },
+            { prompt: "Comment appelle-t-on un corps pur simple avec des atomes identiques situé à gauche de l'escalier ?", acceptable: ["corps metallique", "metallique"], isFormula: false },
+            { prompt: "Quelle est la couleur du papier tournesol en présence d'un acide ?", acceptable: ["rouge"], isFormula: false },
+            { prompt: "Quelle est la couleur du papier tournesol en présence d'un hydroxyde ?", acceptable: ["bleu"], isFormula: false },
+            { prompt: "Quel gaz est dégagé lors de la réaction d'un acide sur un métal ?", acceptable: ["hydrogene", "h2"], isFormula: false },
+            { prompt: "Quel est le deuxième produit formé lors de la neutralisation d'un acide par un hydroxyde (en plus du sel) ?", acceptable: ["eau", "h2o"], isFormula: false },
+            { prompt: "Quelle est la formule générale d'un hydracide ?", acceptable: ["HX"], isFormula: true },
+            { prompt: "Quelle est la formule générale d'un oxacide ?", acceptable: ["HXO"], isFormula: true },
+            { prompt: "Quelle est la formule générale d'un hydroxyde ?", acceptable: ["MOH"], isFormula: true },
+            { prompt: "Quelle est la formule générale d'un sel binaire ?", acceptable: ["MX"], isFormula: true },
+            { prompt: "Quelle est la formule générale d'un sel ternaire ?", acceptable: ["MXO"], isFormula: true },
+            { prompt: "Quelle est la formule générale d'un oxyde métallique ?", acceptable: ["MO"], isFormula: true },
+            { prompt: "Quelle est la formule générale d'un oxyde non-métallique ?", acceptable: ["XO"], isFormula: true },
+            { prompt: "Quel est le nom de la famille d'un acide binaire (ex: HCl) ?", acceptable: ["hydracide", "hydracides"], isFormula: false },
+            { prompt: "Quel est le nom de la famille d'un acide ternaire (ex: H₂SO₄) ?", acceptable: ["oxacide", "oxacides"], isFormula: false },
+            { prompt: "Quelle est la valence du groupement hydroxyde (OH)", acceptable: ["1", "i", "valence i"], isFormula: false },
+            { prompt: "Quelle est la valence de l'ion ferreux Fe(II) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
+            { prompt: "Quelle est la valence de l'ion ferrique Fe(III) ?", acceptable: ["3", "iii", "valence iii"], isFormula: false },
+            { prompt: "Quelle est la valence de l'ion cuivre (II) ?", acceptable: ["2", "ii", "valence ii"], isFormula: false },
+            { prompt: "Le CO₂ fait partie d'une exception. Il est classé dans les corps...", acceptable: ["mineral", "minéral"], isFormula: false },
+            { prompt: "Que donne l'équation de synthèse XO + H₂O ?", acceptable: ["HXO", "oxacide"], isFormula: true },
+            { prompt: "Que donne l'équation de synthèse MO + H₂O ?", acceptable: ["MOH", "hydroxyde"], isFormula: true }
+        ];
+
+        let expertState = { current: null, score: 0, pool: [], index: 0 };
+
+        function loadExpertQuestion() {
+            const container = document.getElementById('expert-container');
+            if (expertState.pool.length === 0 || expertState.index >= expertState.pool.length) {
+                expertState.pool = [...expertPool].sort(() => 0.5 - Math.random());
+                expertState.index = 0;
+            }
+            const item = expertState.pool[expertState.index];
+            expertState.index++;
+            expertState.current = item;
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <p class="text-base font-semibold text-gray-800">${item.prompt}</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="expert-input" placeholder="Tapez votre réponse ici (ex: Ca(OH)2)" class="flex-grow p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-lg bg-white">
+                        <button onclick="checkExpertAnswer()" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition">Valider</button>
+                    </div>
+                    <div id="expert-feedback"></div>
+                </div>
+            `;
+            document.getElementById('expert-input').addEventListener("keypress", function(event) {
+                if (event.key === "Enter") { checkExpertAnswer(); }
+            });
+        }
+
+        function checkExpertAnswer() {
+            const inputVal = document.getElementById('expert-input').value.trim();
+            const item = expertState.current;
+            
+            let isMatch = false;
+            if (item.isFormula) {
+                const cleanInput = inputVal.replace(/\s+/g, '');
+                isMatch = item.acceptable.some(acc => cleanInput === acc.replace(/\s+/g, ''));
+            } else {
+                const cleanInput = inputVal.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+                isMatch = item.acceptable.some(acc => {
+                    const cleanAcc = acc.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+                    return cleanInput === cleanAcc;
+                });
+            }
+
+            const feedbackDiv = document.getElementById('expert-feedback');
+            document.getElementById('expert-input').disabled = true;
+
+            if (isMatch) {
+                expertState.score += 10;
+                feedbackDiv.innerHTML = `<div class="p-4 rounded-lg bg-green-50 border border-green-200 text-green-800 flex justify-between items-center mt-2"><span>✅ <b>Parfait !</b> Bonne réponse.</span><button onclick="loadExpertQuestion()" class="bg-green-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-green-700 transition">Suivant ➔</button></div>`;
+            } else {
+                feedbackDiv.innerHTML = `<div class="p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 flex justify-between items-center mt-2"><span>❌ <b>Incorrect.</b> La réponse exacte attendue était : <b>${item.acceptable[0]}</b></span><button onclick="loadExpertQuestion()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">Suivant ➔</button></div>`;
+            }
+            document.getElementById('expert-score').innerText = `Score Expert : ${expertState.score} pts`;
+        }
+
+        // Lancement initial de l'arbre
+        renderWizard('start');
+    </script>
+</body>
+</html>
